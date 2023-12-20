@@ -59,7 +59,7 @@ dev_dependencies:
 
 flutter:
   assets:
-    - assets/icon.jpeg
+    - assets/
 
   fonts:
     - family: Kalam
