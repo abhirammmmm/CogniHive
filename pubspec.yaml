@@ -37,6 +37,10 @@ dependencies:
   cupertino_icons: ^1.0.2
   url_launcher: ^6.0.10
 
+  # Used for updating the app's icon, 
+  flutter_launcher_icons: ^0.13.1 
+
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -96,3 +100,10 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages
+
+
+# 
+flutter_launcher_icons:
+  android: "launcher_icon"
+  image_path: "assets/App-icon.png"
+  min_sdk_android: 21
