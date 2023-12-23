@@ -6,7 +6,7 @@ void main() {
   runApp(MaterialApp(
     debugShowCheckedModeBanner: false,
     routes: {
-      '/' : (context)=> const LoginUi(),
+      '/' : (context)=> ProfileUI(),
     },
   ));
 }
