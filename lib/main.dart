@@ -1,4 +1,3 @@
-// ignore_for_file: prefer_const_constructors
 
 import 'package:cognihive_version1/firebase_options.dart';
 import 'package:cognihive_version1/screens/Login/login_ui.dart';
