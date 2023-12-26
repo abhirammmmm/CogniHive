@@ -1,16 +1,16 @@
+import 'package:cognihive_version1/providers/firebaseGoogleSigninProvider.dart';
 import 'package:cognihive_version1/widgets/googleSignInButtonWidget.dart';
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher_string.dart';
 
-import 'package:flutter/material.dart';
-// Import additional necessary packages for GoogleSignInButtonWidget if required.
 
-import 'package:flutter/material.dart';
-// Import additional necessary packages for GoogleSignInButtonWidget if required.
-
-class LoginUi extends StatelessWidget {
+class LoginUi extends StatefulWidget {
   const LoginUi({Key? key}) : super(key: key);
 
+  @override
+  State<LoginUi> createState() => _LoginUiState();
+}
+
+class _LoginUiState extends State<LoginUi> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -27,7 +27,7 @@ class LoginUi extends StatelessWidget {
                   ),
                   SizedBox(height: 40), // Space between text and button
                   GoogleSignInButtonWidget(
-                    onPressed: () {},
+                    onPressed: () => firebaseGoogleSigninProvider(context),
                   ),
                 ],
               ),

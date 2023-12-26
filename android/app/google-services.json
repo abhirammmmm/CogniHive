@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "136279959742",
+    "project_id": "cognihive-24f13",
+    "storage_bucket": "cognihive-24f13.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:136279959742:android:692e846fddc56ab3cc96ef",
+        "android_client_info": {
+          "package_name": "com.example.cognihive_version1"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCeyhT9z3Cyr4Pshl283M2vKJihnrAxg2Q"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
