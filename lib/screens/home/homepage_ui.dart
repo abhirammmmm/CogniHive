@@ -1,5 +1,7 @@
+import 'package:cognihive_version1/screens/Login/login_ui.dart';
+import 'package:cognihive_version1/screens/home/profile_ui.dart';
+import 'package:cognihive_version1/screens/home/create_event_page.dart';
 import 'package:flutter/material.dart';
-
 
 class Homepage_Ui extends StatelessWidget {
   @override
@@ -14,7 +16,8 @@ class Homepage_Ui extends StatelessWidget {
         '/createEvent': (context) => CreateEventPage(),
         '/viewEvent': (context) => ViewEventPage(),
         '/searchPage': (context) => SearchEnginePage(),
-        '/menuPage': (context) => MenuPage(),
+        '/profilePage': (context) => ProfileUI(),
+        '/logoutPage': (context) => LoginUi(),
       },
     );
   }
@@ -30,14 +33,6 @@ class HomePage extends StatelessWidget {
         backgroundColor: Colors.black87,
         titleTextStyle: TextStyle(color: Colors.white),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.menu),
-            color: Colors.white,
-            onPressed: () {
-              Navigator.pushNamed(context, '/menuPage');
-              Scaffold.of(context).openDrawer();
-            },
-          ),
         ],
         flexibleSpace: Column(
           mainAxisAlignment: MainAxisAlignment.end,
@@ -58,11 +53,45 @@ class HomePage extends StatelessWidget {
             SizedBox(height: 20),
             Padding(
               padding: const EdgeInsets.only(left: 15.0),
-              child: Text( 'Events', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold), ),
+              child: Text(
+                'Events',
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              ),
             ),
           ],
         ),
       ),
+      endDrawer: Drawer(
+        child: Container(
+          color: Color(0xFFD9D9D9),
+          child: Column(
+            children: [
+              SizedBox(height: 30,),
+              Align(
+                alignment: Alignment.topLeft,
+                child: IconButton(
+                  icon: Icon(
+                    Icons.close,
+                    color: Colors.orange,
+                  ),
+                  onPressed: () {
+                    Navigator.pop(context); // Close the drawer
+                  },
+                ),
+              ),
+              SizedBox(height: 100),
+              buildDrawerItem(context, 'Profile', '/profilePage'),
+              SizedBox(height: 50),
+              buildDrawerItem(context, 'My Events', '/myEventsPage'),
+              SizedBox(height: 380),
+              buildDrawerItem(context, 'Logout', '/logoutPage'),
+            ],
+          ),
+        ),
+      ),
+
+
+
       body: Stack(
         children: <Widget>[
           // Your other content here
@@ -167,20 +196,34 @@ class HomePage extends StatelessWidget {
       ),
     );
   }
-}
 
-class CreateEventPage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Create Event'),
-      ),
-      body: Center(
-        child: Text('This is the Create Event page'),
+  Widget buildDrawerItem(BuildContext context, String title, String route) {
+    return SizedBox(
+      height: 40,
+      width: 180,// Set a fixed height for all buttons
+      child: ElevatedButton(
+        onPressed: () {
+          Navigator.pop(context);
+          Navigator.pushNamed(context, route);
+        },
+        style: ElevatedButton.styleFrom(
+          primary: title == 'Logout' ? Colors.red : Color(0xFF1E2832),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+          ),
+        ),
+        child: Center(
+          child: Text(
+            title,
+            style: TextStyle(color: Colors.white, fontSize: 14),
+          ),
+        ),
       ),
     );
   }
+
+
+
 }
 
 class ViewEventPage extends StatelessWidget {
@@ -194,49 +237,6 @@ class ViewEventPage extends StatelessWidget {
         child: Text(
           'Event created by - ,\nVenue - ,\nDate and Time - ,\nEngage in an illuminating discussion on the Mars Rover at our upcoming event. Explore the latest breakthroughs and share your insights.',
           style: TextStyle(fontSize: 18),
-        ),
-      ),
-    );
-  }
-}
-
-class MenuPage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Menu'),
-      ),
-      drawer: Drawer(
-        child: ListView(
-          padding: EdgeInsets.zero,
-          children: <Widget>[
-            DrawerHeader(
-              decoration: BoxDecoration(
-                color: Colors.blue,
-              ),
-              child: Text(
-                'Drawer Header',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 24,
-                ),
-              ),
-            ),
-            ListTile(
-              title: Text('Item 1'),
-              onTap: () {
-                // Implement action for Item 1
-              },
-            ),
-            ListTile(
-              title: Text('Item 2'),
-              onTap: () {
-                // Implement action for Item 2
-              },
-            ),
-            // Add more ListTiles for additional items
-          ],
         ),
       ),
     );
