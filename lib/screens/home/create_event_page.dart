@@ -4,9 +4,81 @@ class CreateEventPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: Text(''), // Empty text to remove the app bar text
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        iconTheme: IconThemeData(color: Color(0xFF1E2832)), // Menu icon color
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: EventForm(),
+      ),
+      endDrawer: buildDrawer(context), // Drawer on the right side
+    );
+  }
+
+  Widget buildDrawer(BuildContext context) {
+    return Drawer(
+      child: Container(
+        color: Color(0xFFD9D9D9),
+        child: Column(
+          children: [
+            SizedBox(height: 30),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                IconButton(
+                  icon: Icon(
+                    Icons.close,
+                    color: Colors.orange,
+                  ),
+                  onPressed: () {
+                    Navigator.pop(context); // Close the drawer
+                  },
+                ),
+                IconButton(
+                  icon: Icon(
+                    Icons.close,
+                    color: Colors.transparent, // Transparent to create space
+                  ),
+                  onPressed: () {}, // Dummy onPressed
+                ),
+              ],
+            ),
+            SizedBox(height: 100),
+            buildDrawerItem(context, 'Profile', '/profilePage'),
+            SizedBox(height: 50),
+            buildDrawerItem(context, 'Your Events', '/yourEventsPage'),
+            SizedBox(height: 380),
+            buildDrawerItem(context, 'Logout', '/logoutPage'),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget buildDrawerItem(BuildContext context, String title, String route) {
+    return SizedBox(
+      height: 40,
+      width: 180, // Set a fixed height for all buttons
+      child: ElevatedButton(
+        onPressed: () {
+          Navigator.pop(context);
+          Navigator.pushNamed(context, route);
+        },
+        style: ElevatedButton.styleFrom(
+          primary: title == 'Logout' ? Colors.red : Color(0xFF1E2832),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+          ),
+        ),
+        child: Center(
+          child: Text(
+            title,
+            style: TextStyle(color: Colors.white, fontSize: 14),
+          ),
+        ),
       ),
     );
   }

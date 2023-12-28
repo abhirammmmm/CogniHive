@@ -1,6 +1,7 @@
 import 'package:cognihive_version1/screens/Login/login_ui.dart';
 import 'package:cognihive_version1/screens/home/profile_ui.dart';
 import 'package:cognihive_version1/screens/home/create_event_page.dart';
+import 'package:cognihive_version1/screens/home/your_events_page.dart';
 import 'package:flutter/material.dart';
 
 class Homepage_Ui extends StatelessWidget {
@@ -18,6 +19,7 @@ class Homepage_Ui extends StatelessWidget {
         '/searchPage': (context) => SearchEnginePage(),
         '/profilePage': (context) => ProfileUI(),
         '/logoutPage': (context) => LoginUi(),
+        '/yourEventsPage': (context) => YourEventsPage(),
       },
     );
   }
@@ -82,7 +84,7 @@ class HomePage extends StatelessWidget {
               SizedBox(height: 100),
               buildDrawerItem(context, 'Profile', '/profilePage'),
               SizedBox(height: 50),
-              buildDrawerItem(context, 'My Events', '/myEventsPage'),
+              buildDrawerItem(context, 'Your Events', '/yourEventsPage'),
               SizedBox(height: 380),
               buildDrawerItem(context, 'Logout', '/logoutPage'),
             ],
