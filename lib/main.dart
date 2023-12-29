@@ -19,15 +19,15 @@ void main() async {
 
   runApp(MaterialApp(
     debugShowCheckedModeBanner: false,
-    initialRoute: '/homepage',
+    initialRoute: '/viewEvent',
     routes: {
       '/': (context) => LoginUi(),
       '/new_profile': (context) => NewUserDetails(),
       '/homepage': (context) => HomePage(),
       '/createEvent': (context) => CreateEventPage(),
-      '/viewEvent': (context) => ViewEventPage(),
+      '/viewEvent': (context) => ViewEventPage(eventData: const {},),
       '/searchPage': (context) => SearchEnginePage(),
-      '/profilePage': (context) => ProfileUI(),
+      '/editProfilePage': (context) => ProfileUI(),
       '/logoutPage': (context) => LoginUi(),
       '/yourEventsPage': (context) => YourEventsPage(),
     },
