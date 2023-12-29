@@ -1,3 +1,9 @@
+// ignore_for_file: prefer_const_constructors, prefer_final_fields, library_private_types_in_public_api, avoid_print, prefer_const_constructors_in_immutables, prefer_const_literals_to_create_immutables, use_key_in_widget_constructors, deprecated_member_use
+
+import 'dart:math';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class CreateEventPage extends StatelessWidget {
@@ -5,16 +11,16 @@ class CreateEventPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(''), // Empty text to remove the app bar text
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        iconTheme: IconThemeData(color: Color(0xFF1E2832)), // Menu icon color
+        title: Text('Create Event'),
+        centerTitle: true,
+        backgroundColor: Colors.black87,
+        iconTheme: IconThemeData(color: Colors.white),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
+      body: SingleChildScrollView(
+        padding: EdgeInsets.all(16.0),
         child: EventForm(),
       ),
-      endDrawer: buildDrawer(context), // Drawer on the right side
+      endDrawer: buildDrawer(context),
     );
   }
 
@@ -93,120 +99,152 @@ class _EventFormState extends State<EventForm> {
   final _formKey = GlobalKey<FormState>();
   TextEditingController eventNameController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
+  TextEditingController locationController = TextEditingController();
   DateTime? selectedDate;
   TimeOfDay? selectedTime;
+
+  String? errorMessage;
 
   @override
   Widget build(BuildContext context) {
     return Form(
       key: _formKey,
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          SizedBox(height: 35),
-          Text(
-            'Create an Event',
-            style: TextStyle(fontSize: 30, fontWeight: FontWeight.w300),
-          ),
+          buildTextFormField('Name of the Event', eventNameController),
+          buildTextFormField('Description', descriptionController),
+          if (errorMessage != null) // Display error message if not null
+            Padding(
+              padding: EdgeInsets.only(bottom: 16),
+              child: Text(
+                errorMessage!,
+                style: TextStyle(color: Colors.red, fontSize: 14),
+              ),
+            ),
+          buildDateField(),
+          buildTimeField(),
+          buildTextFormField('Event Location', locationController),
           SizedBox(height: 25),
-          TextFormField(
-            controller: eventNameController,
-            decoration: InputDecoration(labelText: 'Name of the Event'),
-            validator: (value) {
-              if (value!.isEmpty) {
-                return 'Please enter the event name';
-              }
-              return null;
-            },
-          ),
-          SizedBox(height: 16),
-          TextFormField(
-            controller: descriptionController,
-            decoration: InputDecoration(labelText: 'Description'),
-            validator: (value) {
-              if (value!.isEmpty) {
-                return 'Please enter the description';
-              }
-              return null;
-            },
-          ),
-          SizedBox(height: 16),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text('Date'),
-              SizedBox(height: 8),
-              ElevatedButton(
-                onPressed: () => _selectDate(context),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF696969),
-                ),
-                child: Text(selectedDate == null
-                    ? 'Select Date'
-                    : 'Selected Date: ${_formatDate(selectedDate!)}'),
-              ),
-              if (selectedDate == null)
-                const Text(
-                  'Please select a date',
-                  style: TextStyle(color: Colors.red),
-                ),
-              SizedBox(height: 16),
-            ],
-          ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text('Time'),
-              SizedBox(height: 8),
-              ElevatedButton(
-                onPressed: () => _selectTime(context),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF696969),
-                ),
-                child: Text(selectedTime == null
-                    ? 'Select Time'
-                    : 'Selected Time: ${_formatTime(selectedTime!)}'),
-              ),
-              if (selectedTime == null)
-                Text(
-                  'Please select a time',
-                  style: TextStyle(color: Colors.red),
-                ),
-              SizedBox(height: 16),
-            ],
-          ),
-          SizedBox(height: 16),
-          TextFormField(
-            decoration: InputDecoration(labelText: 'Event Location'),
-            validator: (value) {
-              if (value!.isEmpty) {
-                return 'Please enter event location';
-              }
-              return null;
-            },
-          ),
-          SizedBox(height: 60),
           ElevatedButton(
-            onPressed: () {
-              if (_formKey.currentState!.validate() &&
-                  selectedDate != null &&
-                  selectedTime != null) {
-                // Form is valid, continue with your logic
-                // e.g., save the event details or navigate to the next page
-                // You can access form fields using eventNameController.text, descriptionController.text, etc.
-              }
-            },
+            onPressed: _submitForm,
             style: ElevatedButton.styleFrom(
-              backgroundColor: Color(0xFFE46821),
-              minimumSize: Size(325, 45),
+              primary: Colors.orange[800],
+              padding: EdgeInsets.symmetric(vertical: 12),
             ),
-            child: Text(
-              'Continue',
-              style: TextStyle(fontSize: 18),
-            ),
+            child: Text('Create Event', style: TextStyle(fontSize: 18)),
           ),
         ],
       ),
+    );
+  }
+
+  void _submitForm() {
+    setState(() {
+      errorMessage = null; // Reset error message
+    });
+
+    if (!_formKey.currentState!.validate()) {
+      return;
+    }
+
+    if (selectedDate == null || selectedTime == null) {
+      setState(() {
+        errorMessage = 'Please select date and time';
+      });
+      return;
+    }
+
+    DateTime now = DateTime.now();
+    DateTime selectedDateTime = DateTime(
+      selectedDate!.year,
+      selectedDate!.month,
+      selectedDate!.day,
+      selectedTime!.hour,
+      selectedTime!.minute,
+    );
+
+    if (selectedDateTime.isBefore(now)) {
+      setState(() {
+        errorMessage = 'Cannot select a past date and time';
+      });
+      return;
+    }
+
+    if (selectedDateTime.difference(now).inHours < 1) {
+      setState(() {
+        errorMessage = 'Event must be at least 1 hour ahead';
+      });
+      return;
+    }
+
+    // Rest of the code for Firestore submission
+    User? currentUser = FirebaseAuth.instance.currentUser;
+    if (currentUser == null) {
+      print("No user logged in");
+      return;
+    }
+
+    String eventUID =
+        "${selectedDateTime.millisecondsSinceEpoch}${Random().nextInt(999)}"; // Generate a unique event UID
+    String formattedDate = _formatDate(selectedDateTime);
+    String formattedTime = _formatTime(selectedTime!);
+
+    FirebaseFirestore.instance.collection('events').doc(eventUID).set({
+      'createdBy': currentUser.uid,
+      'date': formattedDate,
+      'description': descriptionController.text,
+      'eventName': eventNameController.text,
+      'eventUID': eventUID,
+      'location': locationController.text,
+      'time': formattedTime,
+    }).then((_) {
+      print("Event successfully created");
+      Navigator.pushNamed(context, '/homepage');
+    }).catchError((error) {
+      print("Failed to create event: $error");
+    });
+  }
+
+  Widget buildTextFormField(String label, TextEditingController controller) {
+    return Padding(
+      padding: EdgeInsets.only(bottom: 16),
+      child: TextFormField(
+        controller: controller,
+        decoration: InputDecoration(labelText: label),
+        validator: (value) {
+          if (value!.isEmpty) {
+            return 'Please enter $label';
+          }
+          return null;
+        },
+      ),
+    );
+  }
+
+  Widget buildDateField() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('Date',
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+        SizedBox(height: 8),
+        ElevatedButton(
+          onPressed: () => _selectDate(context),
+          style: ElevatedButton.styleFrom(
+            primary: Colors.orange[800],
+          ),
+          child: Text(selectedDate == null
+              ? 'Select Date'
+              : 'Selected Date: ${_formatDate(selectedDate!)}'),
+        ),
+        if (selectedDate == null)
+          Padding(
+            padding: EdgeInsets.only(top: 8),
+            child: Text('Please select a date',
+                style: TextStyle(color: Colors.red)),
+          ),
+      ],
     );
   }
 
@@ -214,7 +252,7 @@ class _EventFormState extends State<EventForm> {
     final DateTime? picked = await showDatePicker(
       context: context,
       initialDate: selectedDate ?? DateTime.now(),
-      firstDate: DateTime.now(),
+      firstDate: DateTime(1900),
       lastDate: DateTime(2101),
     );
     if (picked != null && picked != selectedDate) {
@@ -222,6 +260,36 @@ class _EventFormState extends State<EventForm> {
         selectedDate = picked;
       });
     }
+  }
+
+  String _formatDate(DateTime date) {
+    return '${date.day}/${date.month}/${date.year}';
+  }
+
+  Widget buildTimeField() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('Time',
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+        SizedBox(height: 8),
+        ElevatedButton(
+          onPressed: () => _selectTime(context),
+          style: ElevatedButton.styleFrom(
+            primary: Colors.orange[800],
+          ),
+          child: Text(selectedTime == null
+              ? 'Select Time'
+              : 'Selected Time: ${_formatTime(selectedTime!)}'),
+        ),
+        if (selectedTime == null)
+          Padding(
+            padding: EdgeInsets.only(top: 8),
+            child: Text('Please select a time',
+                style: TextStyle(color: Colors.red)),
+          ),
+      ],
+    );
   }
 
   Future<void> _selectTime(BuildContext context) async {
@@ -236,12 +304,8 @@ class _EventFormState extends State<EventForm> {
     }
   }
 
-  String _formatDate(DateTime date) {
-    return '${date.day}/${date.month}/${date.year}';
-  }
-
   String _formatTime(TimeOfDay time) {
     final period = time.period == DayPeriod.am ? 'AM' : 'PM';
-    return '${time.hourOfPeriod}:${time.minute} $period';
+    return '${time.hourOfPeriod}:${time.minute.toString().padLeft(2, '0')} $period';
   }
 }

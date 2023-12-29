@@ -1,40 +1,67 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
-class DrawerItem extends StatelessWidget {
-  final String title;
-  final String route;
-  final bool isLogout;
+class CustomDrawer extends StatelessWidget {
+  final String currentUserUid = FirebaseAuth.instance.currentUser?.uid ?? '';
 
-  const DrawerItem({
-    Key? key,
-    required this.title,
-    required this.route,
-    this.isLogout = false,
-  }) : super(key: key);
+  CustomDrawer({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 40,
-      width: 180,
-      child: ElevatedButton(
-        onPressed: () {
-          Navigator.pop(context);
-          Navigator.pushNamed(context, route);
-        },
-        style: ElevatedButton.styleFrom(
-          primary: isLogout ? Colors.red : Color(0xFF1E2832),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
+    return Drawer(
+        child: ListView(
+        padding: EdgeInsets.zero, // Removes any default padding
+        children: <Widget>[
+          _createHeader(context),
+          ListTile(
+            leading: Icon(Icons.edit),
+            title: Text('Edit Profile'),
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.pushNamed(context, '/editProfilePage');
+            },
           ),
-        ),
-        child: Center(
-          child: Text(
-            title,
-            style: TextStyle(color: Colors.white, fontSize: 14),
+          ListTile(
+            leading: Icon(Icons.event),
+            title: Text('Your Events'),
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.pushNamed(context, '/yourEventsPage');
+            },
           ),
-        ),
+          ListTile(
+            leading: Icon(Icons.exit_to_app),
+            title: Text('Logout'),
+            onTap: () async {
+              await FirebaseAuth.instance.signOut();
+              Navigator.of(context).pushNamedAndRemoveUntil('/', (route) => false);
+            },
+          ),
+        ],
       ),
+    );
+  }
+
+  Widget _createHeader(BuildContext context) {
+    return FutureBuilder<DocumentSnapshot>(
+      future: FirebaseFirestore.instance.collection('users').doc(currentUserUid).get(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.done && snapshot.data != null) {
+          var userData = snapshot.data!.data() as Map<String, dynamic>;
+          return UserAccountsDrawerHeader(
+            accountName: Text(userData['displayName'] ?? 'Your Name'),
+            accountEmail: Text(FirebaseAuth.instance.currentUser?.email ?? 'youremail@example.com'),
+            currentAccountPicture: CircleAvatar(
+              backgroundImage: NetworkImage(userData['photoURL'] ?? 'https://via.placeholder.com/150'),
+            ),
+            decoration: BoxDecoration(
+              color: Colors.orange[800],
+            ),
+          );
+        }
+        return CircularProgressIndicator();
+      },
     );
   }
 }

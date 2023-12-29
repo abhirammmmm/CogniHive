@@ -1,5 +1,7 @@
 // ignore_for_file: prefer_const_constructors, prefer_final_fields, library_private_types_in_public_api, avoid_print, prefer_const_constructors_in_immutables, prefer_const_literals_to_create_immutables
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cognihive_version1/widgets/event_card.dart';
 import 'package:flutter/material.dart';
 import 'drawer_item.dart';
 
@@ -8,7 +10,7 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Welcome, Linda'),
+        // title: Text('Welcome, Linda'),
         centerTitle: true,
         backgroundColor: Colors.black87,
         titleTextStyle: TextStyle(color: Colors.white),
@@ -26,51 +28,61 @@ class HomePage extends StatelessWidget {
           ),
         ],
       ),
-      endDrawer: Drawer(
-        child: Container(
-          color: Color(0xFFD9D9D9),
-          child: Column(
-            children: [
-              SizedBox(height: 30),
-              Align(
-                alignment: Alignment.topLeft,
-                child: IconButton(
-                  icon: Icon(Icons.close, color: Colors.orange),
-                  onPressed: () => Navigator.pop(context),
-                ),
-              ),
-              SizedBox(height: 100),
-              DrawerItem(title: 'Profile', route: '/profilePage'),
-              SizedBox(height: 50),
-              DrawerItem(title: 'Your Events', route: '/yourEventsPage'),
-              Spacer(),
-              DrawerItem(title: 'Logout', route: '/logoutPage', isLogout: true),
-            ],
-          ),
-        ),
-      ),
-      body: Stack(
+      endDrawer: CustomDrawer(),
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          ListView(
-            padding: EdgeInsets.only(bottom: 80), // Space for the sticky button
-            children: [
-              Padding(
-                padding: EdgeInsets.all(16.0),
-                child: Text(
-                  'Events',
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                ),
+          Padding(
+            padding: EdgeInsets.all(16.0),
+            child: Text(
+              "Welcome Linda",
+              style: TextStyle(
+                fontSize: 28,
+                fontWeight: FontWeight.bold,
+                color: Colors.black87,
               ),
-              ...List.generate(10, (index) => buildEventCard(context)), // Example list
-            ],
+            ),
           ),
-          Positioned(
-            bottom: 16,
-            right: 16,
-            child: buildAddEventButton(context),
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16.0),
+            child: Text(
+              "Events",
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.w600,
+                color: Colors.orange[800],
+              ),
+            ),
+          ),
+          Expanded(
+            child: StreamBuilder<QuerySnapshot>(
+              stream:
+                  FirebaseFirestore.instance.collection('events').snapshots(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return Center(child: CircularProgressIndicator());
+                }
+                if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                  return Center(child: Text('No events found'));
+                }
+
+                var events = snapshot.data!.docs;
+                return ListView.builder(
+                  padding: EdgeInsets.only(bottom: 80, top: 8),
+                  itemCount: events.length,
+                  itemBuilder: (context, index) {
+                    var eventData =
+                        events[index].data() as Map<String, dynamic>;
+                    return EventCard(eventData: eventData);
+                  },
+                );
+              },
+            ),
           ),
         ],
       ),
+      floatingActionButton: buildAddEventButton(context),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
   }
 
@@ -94,7 +106,8 @@ class HomePage extends StatelessWidget {
                   children: [
                     Text(
                       'Discussion on Mars Rover',
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                     ),
                     SizedBox(height: 8),
                     Text(
