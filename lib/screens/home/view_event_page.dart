@@ -1,4 +1,3 @@
-// Import statements
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -15,9 +14,10 @@ class ViewEventPage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(eventData['eventName'] ?? 'Event',
-            style: TextStyle(color: Colors.white)),
-        backgroundColor: Colors.black87,
+        title: const Text(''), // Empty text to remove the app bar text
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        iconTheme: const IconThemeData(color: Color(0xFF1E2832)), // Menu icon color
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
@@ -52,7 +52,7 @@ class ViewEventPage extends StatelessWidget {
                 var userData = snapshot.data!.data() as Map<String, dynamic>;
                 return Text('Created by: ${userData['displayName'] ?? 'N/A'}',
                     style:
-                        TextStyle(fontSize: 18, fontWeight: FontWeight.w500));
+                    TextStyle(fontSize: 18, fontWeight: FontWeight.w500));
               },
             ),
             // Text(eventData['eventUID'] ?? "Null"),
@@ -103,11 +103,19 @@ class _InterestedToggleButtonState extends State<InterestedToggleButton> {
         });
       },
       style: ElevatedButton.styleFrom(
-          primary: isInterested ? Colors.orange[200] : Colors.orange[800]),
-      child: Text(isInterested ? 'Not Interested' : 'Interested',
-          style: TextStyle(fontSize: 18)),
+        backgroundColor: isInterested ? const Color(0xFF1E2832) : const Color(0xFF1E2832),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8.0), // Set border radius to 2 pixels
+        ),
+        minimumSize: Size(double.infinity, 38), // Set width to double.infinity and height to 48
+      ),
+      child: Text(
+        isInterested ? 'Not Interested' : 'Interested',
+        style: const TextStyle(fontSize: 18, color: Colors.white),
+      ),
     );
   }
+
 }
 
 class AnnouncementsSection extends StatefulWidget {
@@ -137,9 +145,9 @@ class _AnnouncementsSectionState extends State<AnnouncementsSection> {
           .doc(widget.eventId)
           .collection('announcements')
           .add({
-            'text': announcementText,
-            'timestamp': FieldValue.serverTimestamp(), // Stores the current time
-          });
+        'text': announcementText,
+        'timestamp': FieldValue.serverTimestamp(), // Stores the current time
+      });
 
       // Clear the text field after successfully posting the announcement
       _announcementController.clear();

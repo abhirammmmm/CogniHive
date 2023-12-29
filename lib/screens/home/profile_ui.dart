@@ -102,13 +102,22 @@ class _ProfileUIState extends State<ProfileUI> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        appBar: PreferredSize(
+        preferredSize: Size.fromHeight(27.0), // Adjust the height as needed
+    child: AppBar(
+    title: const Text(''), // Empty text to remove the app bar text
+    backgroundColor: Colors.transparent,
+    elevation: 0,
+    iconTheme: const IconThemeData(color: Color(0xFF1E2832)), // Menu icon color
+    ),
+        ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Form(
           key: _formKey,
           child: ListView(
             children: [
-              SizedBox(height: 30.0),
+              SizedBox(height: 0.0),
               Text(
                 'User Profile',
                 style: TextStyle(fontSize: 35.0, fontWeight: FontWeight.bold),
@@ -129,7 +138,7 @@ class _ProfileUIState extends State<ProfileUI> {
                   padding: EdgeInsets.symmetric(horizontal: 50),
                   backgroundColor: Color(0xFFE46831),
                 ),
-                child: Text('Save Profile', style: TextStyle(fontSize: 16)),
+                child: Text('Save Profile', style: TextStyle(fontSize: 16,color: Colors.white)),
               ),
             ],
           ),
@@ -167,7 +176,7 @@ class _ProfileUIState extends State<ProfileUI> {
           validator: (value) =>
               value == null ? 'Please select a college' : null,
         ),
-        SizedBox(height: 16.0),
+        SizedBox(height: 10.0),
       ],
     );
   }
@@ -206,7 +215,7 @@ class _ProfileUIState extends State<ProfileUI> {
             return null;
           },
         ),
-        SizedBox(height: 16.0),
+        SizedBox(height: 10.0),
       ],
     );
   }
@@ -255,7 +264,7 @@ class _ProfileUIState extends State<ProfileUI> {
             ),
           ),
         ),
-        SizedBox(height: 16.0),
+        SizedBox(height: 10.0),
       ],
     );
   }
@@ -283,7 +292,7 @@ class _ProfileUIState extends State<ProfileUI> {
             return null;
           },
         ),
-        SizedBox(height: 16.0),
+        SizedBox(height: 10.0),
       ],
     );
   }

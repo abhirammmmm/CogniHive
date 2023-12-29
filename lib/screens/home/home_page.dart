@@ -1,28 +1,58 @@
-// ignore_for_file: prefer_const_constructors, prefer_final_fields, library_private_types_in_public_api, avoid_print, prefer_const_constructors_in_immutables, prefer_const_literals_to_create_immutables
-
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:cognihive_version1/widgets/event_card.dart';
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'drawer_item.dart';
+import '../../widgets/event_card.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
+  @override
+  _HomePageState createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  late TextEditingController _searchController;
+  late Query _eventsQuery;
+
+  @override
+  void initState() {
+    super.initState();
+    _searchController = TextEditingController();
+    _eventsQuery = FirebaseFirestore.instance.collection('events');
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  void _updateSearchQuery(String query) {
+    setState(() {
+      _eventsQuery = FirebaseFirestore.instance
+          .collection('events')
+          .where('eventName', isGreaterThanOrEqualTo: query)
+          .where('eventName', isLessThan: query + 'z'); // Assuming eventName is the field you want to search
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        // title: Text('Welcome, Linda'),
-        centerTitle: true,
+        automaticallyImplyLeading: false,
         backgroundColor: Colors.black87,
-        titleTextStyle: TextStyle(color: Colors.white),
-        leading: IconButton(
-          icon: Icon(Icons.search),
-          color: Colors.white,
-          onPressed: () => Navigator.pushNamed(context, '/searchPage'),
+        title: Row(
+          children: [
+            Text(
+              'Welcome 👋, Linda',
+              style: TextStyle(color: Colors.white, fontSize: 24),
+            ),
+          ],
         ),
         actions: [
           Builder(
             builder: (context) => IconButton(
               icon: Icon(Icons.menu),
+              color: Colors.white,
               onPressed: () => Scaffold.of(context).openEndDrawer(),
             ),
           ),
@@ -33,31 +63,23 @@ class HomePage extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           Padding(
-            padding: EdgeInsets.all(16.0),
-            child: Text(
-              "Welcome Linda",
-              style: TextStyle(
-                fontSize: 28,
-                fontWeight: FontWeight.bold,
-                color: Colors.black87,
-              ),
-            ),
+            padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+            child: buildSearchBar(),
           ),
           Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16.0),
+            padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
             child: Text(
               "Events",
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.w600,
-                color: Colors.orange[800],
+                color: Colors.black87,
               ),
             ),
           ),
           Expanded(
             child: StreamBuilder<QuerySnapshot>(
-              stream:
-                  FirebaseFirestore.instance.collection('events').snapshots(),
+              stream: _eventsQuery.snapshots(),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return Center(child: CircularProgressIndicator());
@@ -71,8 +93,7 @@ class HomePage extends StatelessWidget {
                   padding: EdgeInsets.only(bottom: 80, top: 8),
                   itemCount: events.length,
                   itemBuilder: (context, index) {
-                    var eventData =
-                        events[index].data() as Map<String, dynamic>;
+                    var eventData = events[index].data() as Map<String, dynamic>;
                     return EventCard(eventData: eventData);
                   },
                 );
@@ -86,44 +107,30 @@ class HomePage extends StatelessWidget {
     );
   }
 
-  Widget buildEventCard(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: GestureDetector(
-        onTap: () => Navigator.pushNamed(context, '/showInterest'),
-        child: Container(
-          padding: EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: Colors.grey[200],
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Discussion on Mars Rover',
-                      style:
-                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                    ),
-                    SizedBox(height: 8),
-                    Text(
-                      'Event created by - ,\nVenue - ,\nDate and Time - ,\nEngage in an illuminating discussion...',
-                      style: TextStyle(fontSize: 16),
-                    ),
-                  ],
+  Widget buildSearchBar() {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.grey[200],
+        borderRadius: BorderRadius.circular(30.0),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+        child: Row(
+          children: [
+            Icon(Icons.search, color: Colors.grey),
+            SizedBox(width: 8.0),
+            Expanded(
+              child: TextField(
+                controller: _searchController,
+                onChanged: _updateSearchQuery,
+                decoration: InputDecoration(
+                  hintText: "Search...",
+                  hintStyle: TextStyle(color: Colors.grey),
+                  border: InputBorder.none,
                 ),
               ),
-              SizedBox(width: 16),
-              GestureDetector(
-                onTap: () => Navigator.pushNamed(context, '/viewEvent'),
-                child: Text('View Description'),
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
