@@ -19,7 +19,7 @@ void main() async {
 
   runApp(MaterialApp(
     debugShowCheckedModeBanner: false,
-    initialRoute: '/viewEvent',
+    //initialRoute: '/viewEvent',
     routes: {
       '/': (context) => LoginUi(),
       '/new_profile': (context) => NewUserDetails(),
