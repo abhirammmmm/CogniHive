@@ -2,7 +2,7 @@
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cognihive_version1/models/user_data.dart';
-import 'package:cognihive_version1/screens/home/homepage_ui.dart';
+import 'package:cognihive_version1/screens/home/home_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -252,7 +252,7 @@ class _NewUserDetailsState extends State<NewUserDetails> {
         'profile_complete': true,
       }).then((value) {
         print('User profile updated.');
-        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => Homepage_Ui()));
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => HomePage()));
         // Optionally navigate the user away from the profile page
       }).catchError((error) {
         print('Error updating user profile: $error');
