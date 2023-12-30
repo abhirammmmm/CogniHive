@@ -2,16 +2,21 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class CustomDrawer extends StatelessWidget {
+class CustomDrawer extends StatefulWidget {
   final String currentUserUid = FirebaseAuth.instance.currentUser?.uid ?? '';
 
-  CustomDrawer({Key? key}) : super(key: key);
+  @override
+  _CustomDrawerState createState() => _CustomDrawerState();
+}
+
+class _CustomDrawerState extends State<CustomDrawer> {
+  bool isDarkThemeEnabled = false;
 
   @override
   Widget build(BuildContext context) {
     return Drawer(
-        child: ListView(
-        padding: EdgeInsets.zero, // Removes any default padding
+      child: ListView(
+        padding: EdgeInsets.zero,
         children: <Widget>[
           _createHeader(context),
           ListTile(
@@ -38,6 +43,25 @@ class CustomDrawer extends StatelessWidget {
               Navigator.of(context).pushNamedAndRemoveUntil('/', (route) => false);
             },
           ),
+          ListTile(
+            title: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text('Light'),
+                Switch(
+                  value: isDarkThemeEnabled,
+                  onChanged: (value) {
+                    // Handle toggling between light and dark theme
+                    setState(() {
+                      isDarkThemeEnabled = value;
+                      ThemeSwitcher.of(context).switchTheme();
+                    });
+                  },
+                ),
+                Text('Dark'),
+              ],
+            ),
+          ),
         ],
       ),
     );
@@ -45,7 +69,7 @@ class CustomDrawer extends StatelessWidget {
 
   Widget _createHeader(BuildContext context) {
     return FutureBuilder<DocumentSnapshot>(
-      future: FirebaseFirestore.instance.collection('users').doc(currentUserUid).get(),
+      future: FirebaseFirestore.instance.collection('users').doc(widget.currentUserUid).get(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.done && snapshot.data != null) {
           var userData = snapshot.data!.data() as Map<String, dynamic>;
@@ -64,4 +88,21 @@ class CustomDrawer extends StatelessWidget {
       },
     );
   }
+}
+
+class ThemeSwitcher extends InheritedWidget {
+  final Function switchTheme;
+  final bool isDarkThemeEnabled;
+
+  ThemeSwitcher({
+    required Widget child,
+    required this.switchTheme,
+    required this.isDarkThemeEnabled,
+  }) : super(child: child);
+
+  static ThemeSwitcher of(BuildContext context) =>
+      context.dependOnInheritedWidgetOfExactType<ThemeSwitcher>()!;
+
+  @override
+  bool updateShouldNotify(covariant InheritedWidget oldWidget) => false;
 }
