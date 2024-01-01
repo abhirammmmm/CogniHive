@@ -12,6 +12,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   late TextEditingController _searchController;
   late Query _eventsQuery;
+  Map<String, dynamic>? userData;
   final User? currentUser = FirebaseAuth.instance.currentUser;
 
   @override
@@ -19,12 +20,30 @@ class _HomePageState extends State<HomePage> {
     super.initState();
     _searchController = TextEditingController();
     _eventsQuery = FirebaseFirestore.instance.collection('events');
+    fetchUserData();
   }
 
   @override
   void dispose() {
     _searchController.dispose();
     super.dispose();
+  }
+
+  Future<void> fetchUserData() async {
+    if (currentUser != null) {
+      try {
+        DocumentSnapshot userDoc = await FirebaseFirestore.instance
+            .collection('users')
+            .doc(currentUser!.uid)
+            .get();
+        print(userDoc);
+        setState(() {
+          userData = userDoc.data() as Map<String, dynamic>?;
+        });
+      } catch (e) {
+        print('Error fetching user data: $e');
+      }
+    }
   }
 
   void _updateSearchQuery(String query) {
@@ -49,7 +68,7 @@ class _HomePageState extends State<HomePage> {
         title: Row(
           children: [
             Text(
-              'Welcome 👋, ${currentUser!.displayName}',
+              'Welcome 👋, ${userData?['displayName'] ?? 'Welcome 👋'}',
               style: TextStyle(color: Colors.white, fontSize: 18),
             ),
           ],
