@@ -1,7 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart'; // Import intl package
+import 'package:intl/intl.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ViewEventPage extends StatefulWidget {
   final Map<String, dynamic> eventData;
@@ -50,7 +51,7 @@ class _ViewEventPageState extends State<ViewEventPage>
             if (isCreatedByUser)
               DeleteEventButton(eventId: widget.eventData['eventUID']),
             if (!isCreatedByUser)
-              InterestedToggleButton(eventId: widget.eventData['eventUID']),
+              InterestedToggleButton(eventId: widget.eventData['eventUID'],),
             SizedBox(height: 20),
             TabBar(
               controller: _tabController,
@@ -68,8 +69,6 @@ class _ViewEventPageState extends State<ViewEventPage>
                 ),
               ],
             ),
-
-
 
             Container(
               height: 400, // Adjust the height as needed
@@ -359,11 +358,11 @@ class _InterestedToggleButtonState extends State<InterestedToggleButton> {
     if (currentUserId == null) return;
 
     DocumentSnapshot interestedDoc = await FirebaseFirestore.instance
-      .collection('events')
-      .doc(widget.eventId)
-      .collection('peopleInterested')
-      .doc(currentUserId)
-      .get();
+        .collection('events')
+        .doc(widget.eventId)
+        .collection('peopleInterested')
+        .doc(currentUserId)
+        .get();
 
     if (interestedDoc.exists) {
       setState(() {
@@ -380,9 +379,9 @@ class _InterestedToggleButtonState extends State<InterestedToggleButton> {
     if (currentUserId == null) return;
 
     CollectionReference interestedRef = FirebaseFirestore.instance
-      .collection('events')
-      .doc(widget.eventId)
-      .collection('peopleInterested');
+        .collection('events')
+        .doc(widget.eventId)
+        .collection('peopleInterested');
 
     if (isInterested) {
       // Add the user's UID to the collection
@@ -520,4 +519,4 @@ class AnnouncementsViewer extends StatelessWidget {
       },
     );
   }
-}
+  }
