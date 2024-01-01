@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'drawer_item.dart';
@@ -11,12 +12,15 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   late TextEditingController _searchController;
   late Query _eventsQuery;
+  Map<String, dynamic>? userData;
+  final User? currentUser = FirebaseAuth.instance.currentUser;
 
   @override
   void initState() {
     super.initState();
     _searchController = TextEditingController();
     _eventsQuery = FirebaseFirestore.instance.collection('events');
+    fetchUserData();
   }
 
   @override
@@ -25,12 +29,31 @@ class _HomePageState extends State<HomePage> {
     super.dispose();
   }
 
+  Future<void> fetchUserData() async {
+    if (currentUser != null) {
+      try {
+        DocumentSnapshot userDoc = await FirebaseFirestore.instance
+            .collection('users')
+            .doc(currentUser!.uid)
+            .get();
+        print(userDoc);
+        setState(() {
+          userData = userDoc.data() as Map<String, dynamic>?;
+        });
+      } catch (e) {
+        print('Error fetching user data: $e');
+      }
+    }
+  }
+
   void _updateSearchQuery(String query) {
     setState(() {
       _eventsQuery = FirebaseFirestore.instance
           .collection('events')
           .where('eventName', isGreaterThanOrEqualTo: query)
-          .where('eventName', isLessThan: query + 'z'); // Assuming eventName is the field you want to search
+          .where('eventName',
+              isLessThan: query +
+                  'z'); // Assuming eventName is the field you want to search
     });
   }
 
@@ -45,8 +68,8 @@ class _HomePageState extends State<HomePage> {
         title: Row(
           children: [
             Text(
-              'Welcome 👋, Linda',
-              style: TextStyle(color: Colors.white, fontSize: 24),
+              'Welcome 👋, ${userData?['displayName'] ?? 'Welcome 👋'}',
+              style: TextStyle(color: Colors.white, fontSize: 18),
             ),
           ],
         ),
@@ -99,7 +122,8 @@ class _HomePageState extends State<HomePage> {
                   padding: EdgeInsets.only(bottom: 80, top: 8),
                   itemCount: events.length,
                   itemBuilder: (context, index) {
-                    var eventData = events[index].data() as Map<String, dynamic>;
+                    var eventData =
+                        events[index].data() as Map<String, dynamic>;
                     return EventCard(eventData: eventData);
                   },
                 );
