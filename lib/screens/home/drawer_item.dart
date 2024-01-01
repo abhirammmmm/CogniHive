@@ -25,11 +25,52 @@ class _CustomDrawerState extends State<CustomDrawer> {
         children: <Widget>[
           _createHeader(context),
           ListTile(
+            title: Row(
+              mainAxisAlignment:
+                  MainAxisAlignment.spaceBetween, // Aligns the elements in Row
+              children: [
+                Text('Theme',
+                    style: TextStyle(
+                        fontSize:
+                            16)), // Adds a text label for the theme switcher
+                Row(
+                  children: [
+                    IconButton(
+                      onPressed: () {
+                        Provider.of<ThemeNotifier>(context, listen: false)
+                            .setThemeMode(ThemeMode.light);
+                      },
+                      icon: Icon(Icons.wb_sunny), // Light mode icon
+                      tooltip: 'Light theme',
+                    ),
+                    IconButton(
+                      onPressed: () {
+                        Provider.of<ThemeNotifier>(context, listen: false)
+                            .setThemeMode(ThemeMode.dark);
+                      },
+                      icon: Icon(Icons.nightlight_round), // Dark mode icon
+                      tooltip: 'Dark theme',
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          Divider(),
+          ListTile(
             leading: Icon(Icons.edit),
             title: Text('Edit Profile'),
             onTap: () {
               Navigator.pop(context);
               Navigator.pushNamed(context, '/editProfilePage');
+            },
+          ),
+          ListTile(
+            leading: Icon(Icons.favorite),
+            title: Text('Interested Events'),
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.pushNamed(context, '/interestedEvents');
             },
           ),
           ListTile(
@@ -45,32 +86,9 @@ class _CustomDrawerState extends State<CustomDrawer> {
             title: Text('Logout'),
             onTap: () async {
               await FirebaseAuth.instance.signOut();
-              Navigator.of(context).pushNamedAndRemoveUntil('/', (route) => false);
+              Navigator.of(context)
+                  .pushNamedAndRemoveUntil('/', (route) => false);
             },
-          ),
-          ListTile(
-            title: Row(
-              children: [
-                IconButton(
-                  onPressed: () {
-                    Provider.of<ThemeNotifier>(context, listen: false).setThemeMode(ThemeMode.light);
-                  },
-                  icon: Icon(Icons.wb_sunny), // Light mode icon
-                  tooltip: 'Light theme',
-                ),
-                IconButton(
-                  onPressed: () {
-                    Provider.of<ThemeNotifier>(context, listen: false).setThemeMode(ThemeMode.dark);
-                  },
-                  icon: Icon(Icons.nightlight_round), // Dark mode icon
-                  tooltip: 'Dark theme',
-                ),
-
-
-              ],
-
-
-            ),
           ),
         ],
       ),
@@ -79,15 +97,21 @@ class _CustomDrawerState extends State<CustomDrawer> {
 
   Widget _createHeader(BuildContext context) {
     return FutureBuilder<DocumentSnapshot>(
-      future: FirebaseFirestore.instance.collection('users').doc(widget.currentUserUid).get(),
+      future: FirebaseFirestore.instance
+          .collection('users')
+          .doc(widget.currentUserUid)
+          .get(),
       builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.done && snapshot.data != null) {
+        if (snapshot.connectionState == ConnectionState.done &&
+            snapshot.data != null) {
           var userData = snapshot.data!.data() as Map<String, dynamic>;
           return UserAccountsDrawerHeader(
             accountName: Text(userData['displayName'] ?? 'Your Name'),
-            accountEmail: Text(FirebaseAuth.instance.currentUser?.email ?? 'youremail@example.com'),
+            accountEmail: Text(FirebaseAuth.instance.currentUser?.email ??
+                'youremail@example.com'),
             currentAccountPicture: CircleAvatar(
-              backgroundImage: NetworkImage(userData['photoURL'] ?? 'https://via.placeholder.com/150'),
+              backgroundImage: NetworkImage(
+                  userData['photoURL'] ?? 'https://via.placeholder.com/150'),
             ),
             decoration: BoxDecoration(
               color: Colors.orange[800],
