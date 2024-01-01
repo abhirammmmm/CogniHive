@@ -1,5 +1,3 @@
-// ignore_for_file: prefer_const_constructors
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -37,8 +35,8 @@ class _ViewEventPageState extends State<ViewEventPage>
     var themeData = Theme.of(context);
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: themeData.appBarTheme.backgroundColor,
-        iconTheme: themeData.appBarTheme.iconTheme,
+        title: Text(''),
+        backgroundColor: Colors.black87,
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
@@ -56,11 +54,23 @@ class _ViewEventPageState extends State<ViewEventPage>
             SizedBox(height: 20),
             TabBar(
               controller: _tabController,
+              labelColor: Theme.of(context).brightness == Brightness.dark
+                  ? Colors.white
+                  : Colors.black,
               tabs: [
-                Tab(text: 'Interested People'),
-                Tab(text: 'Announcements'),
+                Tab(
+                  text: 'Interested People',
+                  icon: Icon(Icons.people),
+                ),
+                Tab(
+                  text: 'Announcements',
+                  icon: Icon(Icons.announcement),
+                ),
               ],
             ),
+
+
+
             Container(
               height: 400, // Adjust the height as needed
               child: TabBarView(
@@ -153,14 +163,14 @@ class InterestedPeopleTab extends StatelessWidget {
                   if (userSnapshot.connectionState == ConnectionState.waiting) {
                     return ListTile(title: null);
                   }
-        
+
                   if (userSnapshot.data == null) {
                     return ListTile(title: Text("User data not found"));
                   }
-        
+
                   String userName = userSnapshot.data?['displayName'] ?? 'No Name';
                   String userPhoto = userSnapshot.data?['photoURL'] ?? 'https://via.placeholder.com/150'; // URL to the user's photo
-        
+
                   return ListTile(
                     leading: userPhoto.isNotEmpty ? CircleAvatar(backgroundImage: NetworkImage(userPhoto)) : null,
                     title: Text(userName),
