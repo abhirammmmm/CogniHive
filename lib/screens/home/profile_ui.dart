@@ -108,7 +108,11 @@ class _ProfileUIState extends State<ProfileUI> {
     title: const Text(''), // Empty text to remove the app bar text
     backgroundColor: Colors.transparent,
     elevation: 0,
-    iconTheme: const IconThemeData(color: Color(0xFF1E2832)), // Menu icon color
+      iconTheme: IconThemeData(
+        color: Theme.of(context).brightness == Brightness.dark
+            ? Colors.white
+            : const Color(0xFF1E2832),
+      ), // Menu icon color
     ),
         ),
       body: Padding(

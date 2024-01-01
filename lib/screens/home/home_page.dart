@@ -36,6 +36,8 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
@@ -58,7 +60,11 @@ class _HomePageState extends State<HomePage> {
           ),
         ],
       ),
-      endDrawer: CustomDrawer(),
+      endDrawer: CustomDrawer(
+        onThemeChanged: (themeMode) {
+          // Handle theme change if needed
+        },
+      ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
@@ -73,7 +79,7 @@ class _HomePageState extends State<HomePage> {
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.w600,
-                color: Colors.black87,
+                color: isDarkMode ? Colors.white : Colors.black87,
               ),
             ),
           ),

@@ -31,7 +31,8 @@ Widget build(BuildContext context) {
       child: EventForm(),
     ),
     // Use CustomDrawer as the endDrawer
-    endDrawer: CustomDrawer(),
+    endDrawer: CustomDrawer(onThemeChanged: (themeMode) {
+    },),
   );
 }
 }

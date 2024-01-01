@@ -1,8 +1,6 @@
-// ignore_for_file: prefer_const_constructors
-
+import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cognihive_version1/screens/home/view_event_page.dart';
-import 'package:flutter/material.dart';
 
 class EventCard extends StatelessWidget {
   final Map<String, dynamic> eventData;
@@ -11,6 +9,8 @@ class EventCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: GestureDetector(
@@ -50,13 +50,13 @@ class EventCard extends StatelessWidget {
                     if (snapshot.connectionState == ConnectionState.done) {
                       if (snapshot.hasData && snapshot.data != null) {
                         var userData =
-                            snapshot.data!.data() as Map<String, dynamic>;
+                        snapshot.data!.data() as Map<String, dynamic>;
                         return Text(
                           'Created by: ${userData['displayName'] ?? 'N/A'}',
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w500,
-                            color: Colors.black54,
+                            color: isDarkMode ? Colors.white : Colors.black54,
                           ),
                         );
                       } else {
@@ -65,7 +65,7 @@ class EventCard extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w500,
-                            color: Colors.black54,
+                            color: isDarkMode ? Colors.white : Colors.black54,
                           ),
                         );
                       }
@@ -76,17 +76,26 @@ class EventCard extends StatelessWidget {
                 SizedBox(height: 4),
                 Text(
                   'Venue: ${eventData['location'] ?? 'TBD'}',
-                  style: TextStyle(fontSize: 16, color: Colors.black54),
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: isDarkMode ? Colors.white : Colors.black54,
+                  ),
                 ),
                 SizedBox(height: 4),
                 Text(
                   'Date and Time: ${eventData['date']} at ${eventData['time']}',
-                  style: TextStyle(fontSize: 16, color: Colors.black54),
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: isDarkMode ? Colors.white : Colors.black54,
+                  ),
                 ),
                 SizedBox(height: 8),
                 Text(
                   eventData['description'] ?? 'No description provided.',
-                  style: TextStyle(fontSize: 16),
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: isDarkMode ? Colors.white : Colors.black,
+                  ),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                 ),
