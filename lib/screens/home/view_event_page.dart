@@ -3,18 +3,36 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart'; // Import intl package
 
-class ViewEventPage extends StatelessWidget {
+class ViewEventPage extends StatefulWidget {
   final Map<String, dynamic> eventData;
 
   const ViewEventPage({Key? key, required this.eventData}) : super(key: key);
 
   @override
+  _ViewEventPageState createState() => _ViewEventPageState();
+}
+
+class _ViewEventPageState extends State<ViewEventPage>
+    with SingleTickerProviderStateMixin {
+  late TabController _tabController;
+
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 2, vsync: this);
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final isCreatedByUser =
-        FirebaseAuth.instance.currentUser?.uid == eventData['createdBy'];
-
+        FirebaseAuth.instance.currentUser?.uid == widget.eventData['createdBy'];
     var themeData = Theme.of(context);
-
     return Scaffold(
       appBar: AppBar(
         backgroundColor: themeData.appBarTheme.backgroundColor,
@@ -25,22 +43,138 @@ class ViewEventPage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            EventHeader(eventData: eventData),
-            CreatedBy(eventData: eventData),
+            EventHeader(eventData: widget.eventData),
+            CreatedBy(eventData: widget.eventData),
             SizedBox(height: 10),
-            EventDetails(eventData: eventData),
-            if (!isCreatedByUser)
-              InterestedToggleButton(eventId: eventData['eventUID']),
+            EventDetails(eventData: widget.eventData),
             if (isCreatedByUser)
-              AnnouncementsSection(eventId: eventData['eventUID']),
-            Divider(),
-            SizedBox(height: 10),
-            Text('Announcements',
-                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
-            SizedBox(height: 10),
-            AnnouncementsViewer(eventId: eventData['eventUID']),
+              DeleteEventButton(eventId: widget.eventData['eventUID']),
+            if (!isCreatedByUser)
+              InterestedToggleButton(eventId: widget.eventData['eventUID']),
+            SizedBox(height: 20),
+            TabBar(
+              controller: _tabController,
+              tabs: [
+                Tab(text: 'Announcements'),
+                Tab(text: 'Interested People'),
+              ],
+            ),
+            Container(
+              height: 400, // Adjust the height as needed
+              child: TabBarView(
+                controller: _tabController,
+                children: [
+                  AnnouncementsTab(eventId: widget.eventData['eventUID'], isCreatedByUser: isCreatedByUser),
+                  InterestedPeopleTab(eventId: widget.eventData['eventUID']),
+                ],
+              ),
+            ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class AnnouncementsTab extends StatelessWidget {
+  final String eventId;
+  final bool isCreatedByUser;
+
+  const AnnouncementsTab({Key? key, required this.eventId, required this.isCreatedByUser}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        SizedBox(height: 10,),
+        if (isCreatedByUser)
+          AnnouncementsSection(eventId: eventId),
+        Expanded(
+          child: AnnouncementsViewer(eventId: eventId),
+        ),
+      ],
+    );
+  }
+}
+
+
+class InterestedPeopleTab extends StatelessWidget {
+  final String eventId;
+
+  const InterestedPeopleTab({Key? key, required this.eventId})
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    // Fetch and display the list of interested people
+    return Center(
+      child: Text('Interested People List'),
+    );
+  }
+}
+
+class DeleteEventButton extends StatelessWidget {
+  final String? eventId;
+
+  const DeleteEventButton({Key? key, required this.eventId}) : super(key: key);
+
+  void _confirmDeletion(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext dialogContext) {
+        return AlertDialog(
+          title: Text('Delete Event'),
+          content: Text('Are you sure you want to delete this event?'),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Cancel'),
+              onPressed: () {
+                Navigator.of(dialogContext).pop(); // Dismiss the dialog
+              },
+            ),
+            TextButton(
+              child: Text('Delete'),
+              onPressed: () {
+                Navigator.of(dialogContext).pop(); // Dismiss the dialog
+                _deleteEvent(context); // Proceed with deletion
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _deleteEvent(BuildContext context) async {
+    // Add logic to delete the event from Firestore
+    try {
+      await FirebaseFirestore.instance
+          .collection('events')
+          .doc(eventId)
+          .delete();
+      Navigator.of(context)
+          .pop(); // Go back to the previous screen after deletion
+    } catch (error) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error deleting event: $error')),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ElevatedButton(
+      onPressed: () => _confirmDeletion(context),
+      style: ElevatedButton.styleFrom(
+        backgroundColor: Colors.red,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8.0),
+        ),
+        minimumSize: Size(double.infinity, 38),
+      ),
+      child: Text(
+        'Delete Event',
+        style: const TextStyle(fontSize: 18, color: Colors.white),
       ),
     );
   }
@@ -153,8 +287,7 @@ class _InterestedToggleButtonState extends State<InterestedToggleButton> {
         });
       },
       style: ElevatedButton.styleFrom(
-        backgroundColor:
-            isInterested ? Colors.orange[500] : Colors.orange[800],
+        backgroundColor: isInterested ? Colors.orange[500] : Colors.orange[800],
         shape: RoundedRectangleBorder(
           borderRadius:
               BorderRadius.circular(8.0), // Set border radius to 2 pixels
