@@ -13,6 +13,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:cognihive_version1/theme_notifier.dart';
 
+import 'api/notification_service.dart';
+
 class RunMyApp extends StatelessWidget {
   final Function(ThemeMode) onThemeChanged;
 
@@ -46,7 +48,7 @@ class RunMyApp extends StatelessWidget {
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-
+  NotificationService().initialize();
   final themeNotifier = ThemeNotifier();
 
   runApp(
