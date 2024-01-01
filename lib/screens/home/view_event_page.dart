@@ -1,3 +1,5 @@
+// ignore_for_file: prefer_const_constructors
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -55,8 +57,8 @@ class _ViewEventPageState extends State<ViewEventPage>
             TabBar(
               controller: _tabController,
               tabs: [
-                Tab(text: 'Announcements'),
                 Tab(text: 'Interested People'),
+                Tab(text: 'Announcements'),
               ],
             ),
             Container(
@@ -64,8 +66,10 @@ class _ViewEventPageState extends State<ViewEventPage>
               child: TabBarView(
                 controller: _tabController,
                 children: [
-                  AnnouncementsTab(eventId: widget.eventData['eventUID'], isCreatedByUser: isCreatedByUser),
                   InterestedPeopleTab(eventId: widget.eventData['eventUID']),
+                  AnnouncementsTab(
+                      eventId: widget.eventData['eventUID'],
+                      isCreatedByUser: isCreatedByUser),
                 ],
               ),
             ),
@@ -80,15 +84,18 @@ class AnnouncementsTab extends StatelessWidget {
   final String eventId;
   final bool isCreatedByUser;
 
-  const AnnouncementsTab({Key? key, required this.eventId, required this.isCreatedByUser}) : super(key: key);
+  const AnnouncementsTab(
+      {Key? key, required this.eventId, required this.isCreatedByUser})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
-        SizedBox(height: 10,),
-        if (isCreatedByUser)
-          AnnouncementsSection(eventId: eventId),
+        SizedBox(
+          height: 10,
+        ),
+        if (isCreatedByUser) AnnouncementsSection(eventId: eventId),
         Expanded(
           child: AnnouncementsViewer(eventId: eventId),
         ),
@@ -97,18 +104,73 @@ class AnnouncementsTab extends StatelessWidget {
   }
 }
 
-
 class InterestedPeopleTab extends StatelessWidget {
   final String eventId;
 
-  const InterestedPeopleTab({Key? key, required this.eventId})
-      : super(key: key);
+  const InterestedPeopleTab({Key? key, required this.eventId}) : super(key: key);
+
+  Future<Map<String, dynamic>?> getUserData(String userId) async {
+    try {
+      DocumentSnapshot userDoc = await FirebaseFirestore.instance.collection('users').doc(userId).get();
+      return userDoc.data() as Map<String, dynamic>?;
+    } catch (e) {
+      print("Error fetching user data: $e");
+      return null;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    // Fetch and display the list of interested people
-    return Center(
-      child: Text('Interested People List'),
+    return StreamBuilder<QuerySnapshot>(
+      stream: FirebaseFirestore.instance
+          .collection('events')
+          .doc(eventId)
+          .collection('peopleInterested')
+          .snapshots(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(child: CircularProgressIndicator());
+        }
+
+        if (snapshot.hasError) {
+          return Center(child: Text("Error fetching data"));
+        }
+
+        if (snapshot.data?.docs.isEmpty ?? true) {
+          return Center(child: Text("No one is interested yet"));
+        }
+
+        List<DocumentSnapshot> interestedPeopleDocs = snapshot.data!.docs;
+
+        return Padding(
+          padding: const EdgeInsets.fromLTRB(0, 10, 0, 0),
+          child: ListView(
+            children: interestedPeopleDocs.map((doc) {
+              String userId = doc['uid'];
+              return FutureBuilder<Map<String, dynamic>?>(
+                future: getUserData(userId),
+                builder: (context, userSnapshot) {
+                  if (userSnapshot.connectionState == ConnectionState.waiting) {
+                    return ListTile(title: null);
+                  }
+        
+                  if (userSnapshot.data == null) {
+                    return ListTile(title: Text("User data not found"));
+                  }
+        
+                  String userName = userSnapshot.data?['displayName'] ?? 'No Name';
+                  String userPhoto = userSnapshot.data?['photoURL'] ?? 'https://via.placeholder.com/150'; // URL to the user's photo
+        
+                  return ListTile(
+                    leading: userPhoto.isNotEmpty ? CircleAvatar(backgroundImage: NetworkImage(userPhoto)) : null,
+                    title: Text(userName),
+                  );
+                },
+              );
+            }).toList(),
+          ),
+        );
+      },
     );
   }
 }
@@ -146,7 +208,6 @@ class DeleteEventButton extends StatelessWidget {
   }
 
   void _deleteEvent(BuildContext context) async {
-    // Add logic to delete the event from Firestore
     try {
       await FirebaseFirestore.instance
           .collection('events')
@@ -276,24 +337,62 @@ class InterestedToggleButton extends StatefulWidget {
 
 class _InterestedToggleButtonState extends State<InterestedToggleButton> {
   bool isInterested = false;
+  final String? currentUserId = FirebaseAuth.instance.currentUser?.uid;
+
+  @override
+  void initState() {
+    super.initState();
+    checkIfUserIsInterested();
+  }
+
+  void checkIfUserIsInterested() async {
+    if (currentUserId == null) return;
+
+    DocumentSnapshot interestedDoc = await FirebaseFirestore.instance
+      .collection('events')
+      .doc(widget.eventId)
+      .collection('peopleInterested')
+      .doc(currentUserId)
+      .get();
+
+    if (interestedDoc.exists) {
+      setState(() {
+        isInterested = true;
+      });
+    }
+  }
+
+  void toggleInterested() async {
+    setState(() {
+      isInterested = !isInterested;
+    });
+
+    if (currentUserId == null) return;
+
+    CollectionReference interestedRef = FirebaseFirestore.instance
+      .collection('events')
+      .doc(widget.eventId)
+      .collection('peopleInterested');
+
+    if (isInterested) {
+      // Add the user's UID to the collection
+      await interestedRef.doc(currentUserId).set({'uid': currentUserId});
+    } else {
+      // Remove the user's UID from the collection
+      await interestedRef.doc(currentUserId).delete();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return ElevatedButton(
-      onPressed: () {
-        setState(() {
-          isInterested = !isInterested;
-          // Handle updating Firestore with the user's interest
-        });
-      },
+      onPressed: toggleInterested,
       style: ElevatedButton.styleFrom(
         backgroundColor: isInterested ? Colors.orange[500] : Colors.orange[800],
         shape: RoundedRectangleBorder(
-          borderRadius:
-              BorderRadius.circular(8.0), // Set border radius to 2 pixels
+          borderRadius: BorderRadius.circular(8.0),
         ),
-        minimumSize: Size(double.infinity,
-            38), // Set width to double.infinity and height to 48
+        minimumSize: Size(double.infinity, 38),
       ),
       child: Text(
         isInterested ? 'Not Interested' : 'Interested',
@@ -302,6 +401,7 @@ class _InterestedToggleButtonState extends State<InterestedToggleButton> {
     );
   }
 }
+
 
 class AnnouncementsSection extends StatefulWidget {
   final String? eventId;
