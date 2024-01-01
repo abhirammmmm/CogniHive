@@ -47,15 +47,14 @@ class _HomePageState extends State<HomePage> {
   }
 
   void _updateSearchQuery(String query) {
-    setState(() {
-      _eventsQuery = FirebaseFirestore.instance
-          .collection('events')
-          .where('eventName', isGreaterThanOrEqualTo: query)
-          .where('eventName',
-              isLessThan: query +
-                  'z'); // Assuming eventName is the field you want to search
-    });
-  }
+  String lowerCaseQuery = query.toLowerCase();
+  setState(() {
+    _eventsQuery = FirebaseFirestore.instance
+        .collection('events')
+        .where('eventNameLower', isGreaterThanOrEqualTo: lowerCaseQuery)
+        .where('eventNameLower', isLessThan: lowerCaseQuery + '\uf8ff');
+  });
+}
 
   @override
   Widget build(BuildContext context) {

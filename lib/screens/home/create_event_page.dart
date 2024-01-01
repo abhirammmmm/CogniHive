@@ -8,33 +8,34 @@ import 'package:flutter/material.dart';
 import 'drawer_item.dart';
 
 class CreateEventPage extends StatelessWidget {
-@override
-Widget build(BuildContext context) {
-  return Scaffold(
-    appBar: AppBar(
-      title: Text('Create Event', style: TextStyle(color: Colors.white)),
-      centerTitle: true,
-      backgroundColor: Colors.black87,
-      iconTheme: IconThemeData(color: Colors.white),
-      actions: [
-        // Add the IconButton for opening the endDrawer
-        Builder(
-          builder: (context) => IconButton(
-            icon: Icon(Icons.menu),
-            onPressed: () => Scaffold.of(context).openEndDrawer(),
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Create Event', style: TextStyle(color: Colors.white)),
+        centerTitle: true,
+        backgroundColor: Colors.black87,
+        iconTheme: IconThemeData(color: Colors.white),
+        actions: [
+          // Add the IconButton for opening the endDrawer
+          Builder(
+            builder: (context) => IconButton(
+              icon: Icon(Icons.menu),
+              onPressed: () => Scaffold.of(context).openEndDrawer(),
+            ),
           ),
-        ),
-      ],
-    ),
-    body: SingleChildScrollView(
-      padding: EdgeInsets.all(16.0),
-      child: EventForm(),
-    ),
-    // Use CustomDrawer as the endDrawer
-    endDrawer: CustomDrawer(onThemeChanged: (themeMode) {
-    },),
-  );
-}
+        ],
+      ),
+      body: SingleChildScrollView(
+        padding: EdgeInsets.all(16.0),
+        child: EventForm(),
+      ),
+      // Use CustomDrawer as the endDrawer
+      endDrawer: CustomDrawer(
+        onThemeChanged: (themeMode) {},
+      ),
+    );
+  }
 }
 
 class EventForm extends StatefulWidget {
@@ -79,7 +80,8 @@ class _EventFormState extends State<EventForm> {
               primary: Colors.orange[800],
               padding: EdgeInsets.symmetric(vertical: 12),
             ),
-            child: Text('Create Event', style: TextStyle(color: Colors.white,fontSize: 18)),
+            child: Text('Create Event',
+                style: TextStyle(color: Colors.white, fontSize: 18)),
           ),
         ],
       ),
@@ -145,6 +147,7 @@ class _EventFormState extends State<EventForm> {
       'eventUID': eventUID,
       'location': locationController.text,
       'time': formattedTime,
+      'eventNameLower': eventNameController.text.toLowerCase(),
     }).then((_) {
       print("Event successfully created");
       Navigator.pushNamed(context, '/homepage');
@@ -173,16 +176,19 @@ class _EventFormState extends State<EventForm> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Date', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+        Text('Date',
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
         SizedBox(height: 8),
         ElevatedButton(
           onPressed: () => _selectDate(context),
           style: ElevatedButton.styleFrom(
             primary: Colors.orange[800],
           ),
-          child: Text(style:TextStyle(color: Colors.white),selectedDate == null
-              ? 'Select Date'
-              : 'Selected Date: ${_formatDate(selectedDate!)}'),
+          child: Text(
+              style: TextStyle(color: Colors.white),
+              selectedDate == null
+                  ? 'Select Date'
+                  : 'Selected Date: ${_formatDate(selectedDate!)}'),
         ),
         if (selectedDate == null)
           Padding(
@@ -224,9 +230,11 @@ class _EventFormState extends State<EventForm> {
           style: ElevatedButton.styleFrom(
             primary: Colors.orange[800],
           ),
-          child: Text(style:TextStyle(color: Colors.white),selectedTime == null
-              ? 'Select Time'
-              : 'Selected Time: ${_formatTime(selectedTime!)}'),
+          child: Text(
+              style: TextStyle(color: Colors.white),
+              selectedTime == null
+                  ? 'Select Time'
+                  : 'Selected Time: ${_formatTime(selectedTime!)}'),
         ),
         if (selectedTime == null)
           Padding(
