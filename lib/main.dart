@@ -2,6 +2,7 @@ import 'package:cognihive_version1/firebase_options.dart';
 import 'package:cognihive_version1/screens/Login/login_ui.dart';
 import 'package:cognihive_version1/screens/home/create_event_page.dart';
 import 'package:cognihive_version1/screens/home/home_page.dart';
+import 'package:cognihive_version1/screens/home/my-interested-events.dart';
 import 'package:cognihive_version1/screens/home/new_user_details.dart';
 import 'package:cognihive_version1/screens/home/profile_ui.dart';
 import 'package:cognihive_version1/screens/home/search_page.dart';
@@ -36,6 +37,7 @@ class RunMyApp extends StatelessWidget {
         '/editProfilePage': (context) => ProfileUI(),
         '/logoutPage': (context) => const LoginUi(),
         '/yourEventsPage': (context) => UserEventsPage(),
+        '/interestedEvents': (context) => InterestedEventsPage(),
       },
     );
   }
