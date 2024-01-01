@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'drawer_item.dart';
@@ -11,6 +12,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   late TextEditingController _searchController;
   late Query _eventsQuery;
+  final User? currentUser = FirebaseAuth.instance.currentUser;
 
   @override
   void initState() {
@@ -30,7 +32,9 @@ class _HomePageState extends State<HomePage> {
       _eventsQuery = FirebaseFirestore.instance
           .collection('events')
           .where('eventName', isGreaterThanOrEqualTo: query)
-          .where('eventName', isLessThan: query + 'z'); // Assuming eventName is the field you want to search
+          .where('eventName',
+              isLessThan: query +
+                  'z'); // Assuming eventName is the field you want to search
     });
   }
 
@@ -45,8 +49,8 @@ class _HomePageState extends State<HomePage> {
         title: Row(
           children: [
             Text(
-              'Welcome 👋, Linda',
-              style: TextStyle(color: Colors.white, fontSize: 24),
+              'Welcome 👋, ${currentUser!.displayName}',
+              style: TextStyle(color: Colors.white, fontSize: 18),
             ),
           ],
         ),
@@ -99,7 +103,8 @@ class _HomePageState extends State<HomePage> {
                   padding: EdgeInsets.only(bottom: 80, top: 8),
                   itemCount: events.length,
                   itemBuilder: (context, index) {
-                    var eventData = events[index].data() as Map<String, dynamic>;
+                    var eventData =
+                        events[index].data() as Map<String, dynamic>;
                     return EventCard(eventData: eventData);
                   },
                 );
