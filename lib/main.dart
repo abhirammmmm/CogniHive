@@ -35,7 +35,7 @@ class RunMyApp extends StatelessWidget {
         '/searchPage': (context) => SearchEnginePage(),
         '/editProfilePage': (context) => ProfileUI(),
         '/logoutPage': (context) => const LoginUi(),
-        '/yourEventsPage': (context) => YourEventsPage(),
+        '/yourEventsPage': (context) => UserEventsPage(),
       },
     );
   }
