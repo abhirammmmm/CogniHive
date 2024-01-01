@@ -9,13 +9,13 @@ class CustomDrawer extends StatefulWidget {
   final Function(ThemeMode) onThemeChanged;
 
   CustomDrawer({Key? key, required this.onThemeChanged}) : super(key: key);
-
   @override
   _CustomDrawerState createState() => _CustomDrawerState();
 }
 
 class _CustomDrawerState extends State<CustomDrawer> {
   bool switchValue = false;
+  bool isDarkThemeEnabled = false;
 
   @override
   Widget build(BuildContext context) {
@@ -69,6 +69,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
 
               ],
 
+
             ),
           ),
         ],
@@ -97,4 +98,21 @@ class _CustomDrawerState extends State<CustomDrawer> {
       },
     );
   }
+}
+
+class ThemeSwitcher extends InheritedWidget {
+  final Function switchTheme;
+  final bool isDarkThemeEnabled;
+
+  ThemeSwitcher({
+    required Widget child,
+    required this.switchTheme,
+    required this.isDarkThemeEnabled,
+  }) : super(child: child);
+
+  static ThemeSwitcher of(BuildContext context) =>
+      context.dependOnInheritedWidgetOfExactType<ThemeSwitcher>()!;
+
+  @override
+  bool updateShouldNotify(covariant InheritedWidget oldWidget) => false;
 }
