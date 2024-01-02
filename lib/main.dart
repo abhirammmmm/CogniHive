@@ -29,7 +29,7 @@ class RunMyApp extends StatelessWidget {
       theme: ThemeData.light(),
       darkTheme: ThemeData.dark(),
       themeMode: themeNotifier.themeMode,
-      home: const LoginUi(),
+      home:  LoginUi(),
       routes: {
         '/new_profile': (context) => NewUserDetails(),
         '/homepage': (context) => HomePage(),

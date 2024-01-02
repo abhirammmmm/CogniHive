@@ -12,6 +12,6 @@ void main() async {
     print("FCM Token: $token");
   });
   messaging.onTokenRefresh.listen((token) {
-    print("FCM Token (Refreshed): $token");
-  });
+  print("FCM Token (Refreshed): $token");
+ });
 }
