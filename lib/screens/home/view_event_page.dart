@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
+//import 'package:add_2_calendar/add_2_calendar.dart';
 
 class ViewEventPage extends StatefulWidget {
   final Map<String, dynamic> eventData;
@@ -16,6 +17,8 @@ class ViewEventPage extends StatefulWidget {
 class _ViewEventPageState extends State<ViewEventPage>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
+
+  void launchGoogleCalendar() {}
 
   @override
   void initState() {
@@ -51,7 +54,7 @@ class _ViewEventPageState extends State<ViewEventPage>
             if (isCreatedByUser)
               DeleteEventButton(eventId: widget.eventData['eventUID']),
             if (!isCreatedByUser)
-              InterestedToggleButton(eventId: widget.eventData['eventUID'],),
+              InterestedToggleButton(eventId: widget.eventData['eventUID'], eventData: widget.eventData, launchGoogleCalendar: launchGoogleCalendar,),
             SizedBox(height: 20),
             TabBar(
               controller: _tabController,
@@ -336,9 +339,15 @@ class CreatedBy extends StatelessWidget {
 
 class InterestedToggleButton extends StatefulWidget {
   final String? eventId;
+  final Function launchGoogleCalendar;
+  final Map<String, dynamic> eventData;
 
-  const InterestedToggleButton({Key? key, required this.eventId})
-      : super(key: key);
+  InterestedToggleButton({
+    Key? key,
+    required this.eventId,
+    required this.launchGoogleCalendar,
+    required this.eventData, // Add this line
+  }) : super(key: key);
 
   @override
   _InterestedToggleButtonState createState() => _InterestedToggleButtonState();
@@ -386,11 +395,50 @@ class _InterestedToggleButtonState extends State<InterestedToggleButton> {
     if (isInterested) {
       // Add the user's UID to the collection
       await interestedRef.doc(currentUserId).set({'uid': currentUserId});
+
+      // Integrate with the calendar
+      launchGoogleCalendar();
     } else {
       // Remove the user's UID from the collection
       await interestedRef.doc(currentUserId).delete();
     }
   }
+
+  void launchGoogleCalendar() async {
+    // Replace the placeholders with your actual event details
+    String eventName = widget.eventData['eventName'] ?? 'Your Event Name';
+    String eventDescription = widget.eventData['description'] ?? 'Your Event Description';
+    String eventDate = widget.eventData['date'] ?? '';
+    String eventTime = widget.eventData['time'] ?? '';
+    String eventLocation = widget.eventData['location'] ?? ''; // Add this line
+
+    print('Event Date: $eventDate');
+    print('Event Time: $eventTime');
+    print('Event Location: $eventLocation');
+
+    if (eventDate.isEmpty || eventTime.isEmpty) {
+      print('Invalid date or time format.');
+      return;
+    }
+
+    DateTime eventDateTime = DateFormat('d/M/yyyy h:mm a').parse('$eventDate $eventTime');
+
+    // Format the date and time
+    String formattedDate = DateFormat('yyyyMMddTHHmmss').format(eventDateTime);
+
+    // Construct the Google Calendar event URL
+    String googleCalendarUrl =
+        'https://www.google.com/calendar/render?action=TEMPLATE&text=$eventName&details=$eventDescription&location=$eventLocation&dates=$formattedDate/$formattedDate';
+
+    // Launch the URL using launchUrl from url_launcher package
+    try {
+      await launchUrl(Uri.parse(googleCalendarUrl));
+    } catch (e) {
+      print('Could not launch Google Calendar: $e');
+    }
+  }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -410,6 +458,7 @@ class _InterestedToggleButtonState extends State<InterestedToggleButton> {
     );
   }
 }
+
 
 
 class AnnouncementsSection extends StatefulWidget {
@@ -519,4 +568,4 @@ class AnnouncementsViewer extends StatelessWidget {
       },
     );
   }
-  }
+}
