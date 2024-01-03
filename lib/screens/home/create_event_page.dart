@@ -149,6 +149,24 @@ class _EventFormState extends State<EventForm> {
     }).then((_) async {
       print("Event successfully created");
       await _launchGoogleCalendar();
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+            content: Text(
+              "Your event has been created successfully!",
+              style: TextStyle(color: Colors.white),
+            ),
+            duration: Duration(seconds: 10),
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20.0),
+            ),
+            margin: EdgeInsets.all(10.0),
+            padding: EdgeInsets.symmetric(horizontal: 14.0, vertical: 10.0),
+            elevation: 6.0,
+            backgroundColor: Colors.green[400]),
+      );
+
       Navigator.pushNamed(context, '/homepage');
     }).catchError((error) {
       print("Failed to create event: $error");
