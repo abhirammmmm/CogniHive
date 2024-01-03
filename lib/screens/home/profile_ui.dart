@@ -102,19 +102,19 @@ class _ProfileUIState extends State<ProfileUI> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: PreferredSize(
+      appBar: PreferredSize(
         preferredSize: Size.fromHeight(27.0), // Adjust the height as needed
-    child: AppBar(
-    title: const Text(''), // Empty text to remove the app bar text
-    backgroundColor: Colors.transparent,
-    elevation: 0,
-      iconTheme: IconThemeData(
-        color: Theme.of(context).brightness == Brightness.dark
-            ? Colors.white
-            : const Color(0xFF1E2832),
-      ), // Menu icon color
-    ),
+        child: AppBar(
+          title: const Text(''), // Empty text to remove the app bar text
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          iconTheme: IconThemeData(
+            color: Theme.of(context).brightness == Brightness.dark
+                ? Colors.white
+                : const Color(0xFF1E2832),
+          ), // Menu icon color
         ),
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Form(
@@ -142,7 +142,8 @@ class _ProfileUIState extends State<ProfileUI> {
                   padding: EdgeInsets.symmetric(horizontal: 50),
                   backgroundColor: Color(0xFFE46831),
                 ),
-                child: Text('Save Profile', style: TextStyle(fontSize: 16,color: Colors.white)),
+                child: Text('Save Profile',
+                    style: TextStyle(fontSize: 16, color: Colors.white)),
               ),
             ],
           ),
@@ -331,6 +332,22 @@ class _ProfileUIState extends State<ProfileUI> {
           'profile_complete': true,
         }).then((value) {
           print('User profile updated.');
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+                content: Text(
+                  "Profile Updated!",
+                  style: TextStyle(color: Colors.white),
+                ),
+                duration: Duration(seconds: 10),
+                behavior: SnackBarBehavior.floating,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20.0),
+                ),
+                margin: EdgeInsets.all(10.0),
+                padding: EdgeInsets.symmetric(horizontal: 14.0, vertical: 10.0),
+                elevation: 6.0,
+                backgroundColor: Colors.green[400]),
+          );
           Navigator.pushReplacement(
               context, MaterialPageRoute(builder: (context) => HomePage()));
           // Optionally navigate the user away from the profile page
