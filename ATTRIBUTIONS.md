@@ -137,3 +137,32 @@
 - Source: [YouTube Video](https://www.youtube.com/watch?v=A3M0N_B-CR0)
 - Description: A comprehensive tutorial on setting up Android push notifications in a Flutter application with Firebase.
 
+## flutter_testing
+
+- Flutter Integration Tests Documentation: 
+- Source: [Link](https://docs.flutter.dev/testing/integration-tests)
+
+## Firebase Test
+
+- Firebase Google Test Lab Integration for Flutter: 
+- Source: [Link](https://medium.com/firebase-developers/google-firebase-test-lab-integration-for-flutter-integration-tests-38f903d47ac3#:~:text=The%20previous%20step%20will%20set,want%20to%20run%20the%20tests.&text=This%20step%20will%20upload%20the,debug%20APK%20and%20test%20APK.)
+
+## Widget Testing
+
+- YouTube Tutorial Playlist: 
+- Source: [Link](https://www.youtube.com/watch?v=uB5_REsREtU&list=PLUiueC0kTFqLvpFk_Zg55geh_TBTKnbnA&index=5)
+
+## Firebase Auth Integration Testing
+
+- YouTube Video: 
+- Source: [Link](https://www.youtube.com/watch?v=YjtGT7Cccd0)
+
+## Debugging Gradle issues:
+
+- StackOverflow: Gradle Build Issue: 
+- Source: [Link](https://stackoverflow.com/questions/47760823/gradle-build-successfully-without-error-but-still-shows-error-on-the-build-gradl)
+
+## Flutter Integration Test:
+
+- Flutter Integration Test GitHub: 
+- Source: [Link](https://github.com/flutter/flutter/tree/main/packages/integration_test#android-device-testing)
