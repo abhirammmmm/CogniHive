@@ -1,8 +1,11 @@
+// ignore_for_file: prefer_const_constructors
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
+//import 'package:add_2_calendar/add_2_calendar.dart';
 
 class ViewEventPage extends StatefulWidget {
   final Map<String, dynamic> eventData;
@@ -16,6 +19,8 @@ class ViewEventPage extends StatefulWidget {
 class _ViewEventPageState extends State<ViewEventPage>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
+
+  void launchGoogleCalendar() {}
 
   @override
   void initState() {
@@ -51,7 +56,11 @@ class _ViewEventPageState extends State<ViewEventPage>
             if (isCreatedByUser)
               DeleteEventButton(eventId: widget.eventData['eventUID']),
             if (!isCreatedByUser)
-              InterestedToggleButton(eventId: widget.eventData['eventUID'],),
+              InterestedToggleButton(
+                eventId: widget.eventData['eventUID'],
+                eventData: widget.eventData,
+                launchGoogleCalendar: launchGoogleCalendar,
+              ),
             SizedBox(height: 20),
             TabBar(
               controller: _tabController,
@@ -69,7 +78,6 @@ class _ViewEventPageState extends State<ViewEventPage>
                 ),
               ],
             ),
-
             Container(
               height: 400, // Adjust the height as needed
               child: TabBarView(
@@ -116,11 +124,15 @@ class AnnouncementsTab extends StatelessWidget {
 class InterestedPeopleTab extends StatelessWidget {
   final String eventId;
 
-  const InterestedPeopleTab({Key? key, required this.eventId}) : super(key: key);
+  const InterestedPeopleTab({Key? key, required this.eventId})
+      : super(key: key);
 
   Future<Map<String, dynamic>?> getUserData(String userId) async {
     try {
-      DocumentSnapshot userDoc = await FirebaseFirestore.instance.collection('users').doc(userId).get();
+      DocumentSnapshot userDoc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(userId)
+          .get();
       return userDoc.data() as Map<String, dynamic>?;
     } catch (e) {
       print("Error fetching user data: $e");
@@ -167,11 +179,15 @@ class InterestedPeopleTab extends StatelessWidget {
                     return ListTile(title: Text("User data not found"));
                   }
 
-                  String userName = userSnapshot.data?['displayName'] ?? 'No Name';
-                  String userPhoto = userSnapshot.data?['photoURL'] ?? 'https://via.placeholder.com/150'; // URL to the user's photo
+                  String userName =
+                      userSnapshot.data?['displayName'] ?? 'No Name';
+                  String userPhoto = userSnapshot.data?['photoURL'] ??
+                      'https://via.placeholder.com/150'; // URL to the user's photo
 
                   return ListTile(
-                    leading: userPhoto.isNotEmpty ? CircleAvatar(backgroundImage: NetworkImage(userPhoto)) : null,
+                    leading: userPhoto.isNotEmpty
+                        ? CircleAvatar(backgroundImage: NetworkImage(userPhoto))
+                        : null,
                     title: Text(userName),
                   );
                 },
@@ -222,8 +238,23 @@ class DeleteEventButton extends StatelessWidget {
           .collection('events')
           .doc(eventId)
           .delete();
-      Navigator.of(context)
-          .pop(); // Go back to the previous screen after deletion
+      Navigator.of(context).pop();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+            content: Text(
+              "Event Deleted Successfully!",
+              style: TextStyle(color: Colors.white),
+            ),
+            duration: Duration(seconds: 10),
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20.0),
+            ),
+            margin: EdgeInsets.all(10.0),
+            padding: EdgeInsets.symmetric(horizontal: 14.0, vertical: 10.0),
+            elevation: 6.0,
+            backgroundColor: Colors.green[400]),
+      );
     } catch (error) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error deleting event: $error')),
@@ -336,9 +367,15 @@ class CreatedBy extends StatelessWidget {
 
 class InterestedToggleButton extends StatefulWidget {
   final String? eventId;
+  final Function launchGoogleCalendar;
+  final Map<String, dynamic> eventData;
 
-  const InterestedToggleButton({Key? key, required this.eventId})
-      : super(key: key);
+  InterestedToggleButton({
+    Key? key,
+    required this.eventId,
+    required this.launchGoogleCalendar,
+    required this.eventData, // Add this line
+  }) : super(key: key);
 
   @override
   _InterestedToggleButtonState createState() => _InterestedToggleButtonState();
@@ -386,9 +423,64 @@ class _InterestedToggleButtonState extends State<InterestedToggleButton> {
     if (isInterested) {
       // Add the user's UID to the collection
       await interestedRef.doc(currentUserId).set({'uid': currentUserId});
+
+      // Integrate with the calendar
+      launchGoogleCalendar();
     } else {
       // Remove the user's UID from the collection
       await interestedRef.doc(currentUserId).delete();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+            content: Text(
+              "You are no more interested for this event. Please note, deletion of events from Google Calendar is manual for now. We are working to automate this soon!",
+              style: TextStyle(color: Colors.white),
+            ),
+            duration: Duration(seconds: 10),
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20.0),
+            ),
+            margin: EdgeInsets.all(10.0),
+            padding: EdgeInsets.symmetric(horizontal: 14.0, vertical: 10.0),
+            elevation: 6.0,
+            backgroundColor: Colors.red[400]),
+      );
+    }
+  }
+
+  void launchGoogleCalendar() async {
+    // Replace the placeholders with your actual event details
+    String eventName = widget.eventData['eventName'] ?? 'Your Event Name';
+    String eventDescription =
+        widget.eventData['description'] ?? 'Your Event Description';
+    String eventDate = widget.eventData['date'] ?? '';
+    String eventTime = widget.eventData['time'] ?? '';
+    String eventLocation = widget.eventData['location'] ?? ''; // Add this line
+
+    print('Event Date: $eventDate');
+    print('Event Time: $eventTime');
+    print('Event Location: $eventLocation');
+
+    if (eventDate.isEmpty || eventTime.isEmpty) {
+      print('Invalid date or time format.');
+      return;
+    }
+
+    DateTime eventDateTime =
+        DateFormat('d/M/yyyy h:mm a').parse('$eventDate $eventTime');
+
+    // Format the date and time
+    String formattedDate = DateFormat('yyyyMMddTHHmmss').format(eventDateTime);
+
+    // Construct the Google Calendar event URL
+    String googleCalendarUrl =
+        'https://www.google.com/calendar/render?action=TEMPLATE&text=$eventName&details=$eventDescription&location=$eventLocation&dates=$formattedDate/$formattedDate';
+
+    // Launch the URL using launchUrl from url_launcher package
+    try {
+      await launchUrl(Uri.parse(googleCalendarUrl));
+    } catch (e) {
+      print('Could not launch Google Calendar: $e');
     }
   }
 
@@ -410,7 +502,6 @@ class _InterestedToggleButtonState extends State<InterestedToggleButton> {
     );
   }
 }
-
 
 class AnnouncementsSection extends StatefulWidget {
   final String? eventId;
@@ -445,6 +536,22 @@ class _AnnouncementsSectionState extends State<AnnouncementsSection> {
 
       // Clear the text field after successfully posting the announcement
       _announcementController.clear();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+            content: Text(
+              "Announcement Posted Successfully!",
+              style: TextStyle(color: Colors.white),
+            ),
+            duration: Duration(seconds: 10),
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20.0),
+            ),
+            margin: EdgeInsets.all(10.0),
+            padding: EdgeInsets.symmetric(horizontal: 14.0, vertical: 10.0),
+            elevation: 6.0,
+            backgroundColor: Colors.green[400]),
+      );
       print('Announcement successfully posted.');
     } catch (error) {
       print('Error posting announcement: $error');
@@ -519,4 +626,4 @@ class AnnouncementsViewer extends StatelessWidget {
       },
     );
   }
-  }
+}

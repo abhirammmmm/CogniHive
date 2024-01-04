@@ -1,4 +1,4 @@
-// ignore_for_file: prefer_const_constructors, prefer_final_fields, library_private_types_in_public_api, avoid_print, prefer_const_constructors_in_immutables, prefer_const_literals_to_create_immutables, use_key_in_widget_constructors, deprecated_member_use
+// ignore_for_file: prefer_const_constructors, prefer_final_fields, library_private_types_in_public_api, avoid_print, prefer_const_constructors_in_immutables, use_key_in_widget_constructors, deprecated_member_use
 
 import 'dart:math';
 
@@ -6,6 +6,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'drawer_item.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class CreateEventPage extends StatelessWidget {
   @override
@@ -17,7 +18,6 @@ class CreateEventPage extends StatelessWidget {
         backgroundColor: Colors.black87,
         iconTheme: IconThemeData(color: Colors.white),
         actions: [
-          // Add the IconButton for opening the endDrawer
           Builder(
             builder: (context) => IconButton(
               icon: Icon(Icons.menu),
@@ -30,7 +30,6 @@ class CreateEventPage extends StatelessWidget {
         padding: EdgeInsets.all(16.0),
         child: EventForm(),
       ),
-      // Use CustomDrawer as the endDrawer
       endDrawer: CustomDrawer(
         onThemeChanged: (themeMode) {},
       ),
@@ -62,7 +61,7 @@ class _EventFormState extends State<EventForm> {
         children: [
           buildTextFormField('Name of the Event', eventNameController),
           buildTextFormField('Description', descriptionController),
-          if (errorMessage != null) // Display error message if not null
+          if (errorMessage != null)
             Padding(
               padding: EdgeInsets.only(bottom: 16),
               child: Text(
@@ -88,9 +87,9 @@ class _EventFormState extends State<EventForm> {
     );
   }
 
-  void _submitForm() {
+  void _submitForm() async {
     setState(() {
-      errorMessage = null; // Reset error message
+      errorMessage = null;
     });
 
     if (!_formKey.currentState!.validate()) {
@@ -127,7 +126,6 @@ class _EventFormState extends State<EventForm> {
       return;
     }
 
-    // Rest of the code for Firestore submission
     User? currentUser = FirebaseAuth.instance.currentUser;
     if (currentUser == null) {
       print("No user logged in");
@@ -135,7 +133,7 @@ class _EventFormState extends State<EventForm> {
     }
 
     String eventUID =
-        "${selectedDateTime.millisecondsSinceEpoch}${Random().nextInt(999)}"; // Generate a unique event UID
+        "${selectedDateTime.millisecondsSinceEpoch}${Random().nextInt(999)}";
     String formattedDate = _formatDate(selectedDateTime);
     String formattedTime = _formatTime(selectedTime!);
 
@@ -148,8 +146,27 @@ class _EventFormState extends State<EventForm> {
       'location': locationController.text,
       'time': formattedTime,
       'eventNameLower': eventNameController.text.toLowerCase(),
-    }).then((_) {
+    }).then((_) async {
       print("Event successfully created");
+      await _launchGoogleCalendar();
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+            content: Text(
+              "Your event has been created successfully!",
+              style: TextStyle(color: Colors.white),
+            ),
+            duration: Duration(seconds: 10),
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20.0),
+            ),
+            margin: EdgeInsets.all(10.0),
+            padding: EdgeInsets.symmetric(horizontal: 14.0, vertical: 10.0),
+            elevation: 6.0,
+            backgroundColor: Colors.green[400]),
+      );
+
       Navigator.pushNamed(context, '/homepage');
     }).catchError((error) {
       print("Failed to create event: $error");
@@ -261,5 +278,39 @@ class _EventFormState extends State<EventForm> {
   String _formatTime(TimeOfDay time) {
     final period = time.period == DayPeriod.am ? 'AM' : 'PM';
     return '${time.hourOfPeriod}:${time.minute.toString().padLeft(2, '0')} $period';
+  }
+
+  String _formatGoogleCalendarDate(DateTime dateTime) {
+    String year = dateTime.year.toString();
+    String month = dateTime.month.toString().padLeft(2, '0');
+    String day = dateTime.day.toString().padLeft(2, '0');
+
+    return '$year$month$day';
+  }
+
+  String _formatGoogleCalendarTime(TimeOfDay time) {
+    String hour = time.hour.toString().padLeft(2, '0');
+    String minute = time.minute.toString().padLeft(2, '0');
+
+    return '$hour$minute';
+  }
+
+  Future<void> _launchGoogleCalendar() async {
+    if (selectedDate == null || selectedTime == null) {
+      return;
+    }
+
+    try {
+      String googleCalendarUrl =
+          'https://www.google.com/calendar/render?action=TEMPLATE'
+          '&text=${Uri.encodeComponent(eventNameController.text)}'
+          '&details=${Uri.encodeComponent(descriptionController.text)}'
+          '&location=${Uri.encodeComponent(locationController.text)}'
+          '&dates=${_formatGoogleCalendarDate(selectedDate!)}T${_formatGoogleCalendarTime(selectedTime!)}';
+
+      await launch(googleCalendarUrl);
+    } catch (e) {
+      print('Error launching Google Calendar: $e');
+    }
   }
 }
