@@ -77,7 +77,7 @@ class _EventFormState extends State<EventForm> {
           ElevatedButton(
             onPressed: _submitForm,
             style: ElevatedButton.styleFrom(
-              primary: Colors.orange[800],
+              backgroundColor: Colors.orange[800],
               padding: EdgeInsets.symmetric(vertical: 12),
             ),
             child: Text('Create Event',
@@ -200,7 +200,7 @@ class _EventFormState extends State<EventForm> {
         ElevatedButton(
           onPressed: () => _selectDate(context),
           style: ElevatedButton.styleFrom(
-            primary: Colors.orange[800],
+            backgroundColor: Colors.orange[800],
           ),
           child: Text(
             selectedDate == null
@@ -247,7 +247,7 @@ class _EventFormState extends State<EventForm> {
         ElevatedButton(
           onPressed: () => _selectTime(context),
           style: ElevatedButton.styleFrom(
-            primary: Colors.orange[800],
+            backgroundColor: Colors.orange[800],
           ),
           child: Text(
             selectedTime == null

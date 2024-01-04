@@ -42,7 +42,6 @@ class _ProfileUIState extends State<ProfileUI> {
 
   @override
   void dispose() {
-    // Dispose controllers and remove listeners
     _firstNameController.removeListener(_onFieldChanged);
     _lastNameController.removeListener(_onFieldChanged);
     _phoneController.removeListener(_onFieldChanged);
