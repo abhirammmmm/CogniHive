@@ -1,4 +1,4 @@
-package cogniHive_pack;
+package com.example.cognihive_version1;
 
 import androidx.test.rule.ActivityTestRule;
 import dev.flutter.plugins.integration_test.FlutterTestRunner;
