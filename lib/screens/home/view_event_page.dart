@@ -1,5 +1,3 @@
-// ignore_for_file: prefer_const_constructors
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -182,7 +180,7 @@ class InterestedPeopleTab extends StatelessWidget {
                   String userName =
                       userSnapshot.data?['displayName'] ?? 'No Name';
                   String userPhoto = userSnapshot.data?['photoURL'] ??
-                      'https://via.placeholder.com/150'; // URL to the user's photo
+                      'https://via.placeholder.com/150';
 
                   return ListTile(
                     leading: userPhoto.isNotEmpty
@@ -216,14 +214,14 @@ class DeleteEventButton extends StatelessWidget {
             TextButton(
               child: Text('Cancel'),
               onPressed: () {
-                Navigator.of(dialogContext).pop(); // Dismiss the dialog
+                Navigator.of(dialogContext).pop();
               },
             ),
             TextButton(
               child: Text('Delete'),
               onPressed: () {
-                Navigator.of(dialogContext).pop(); // Dismiss the dialog
-                _deleteEvent(context); // Proceed with deletion
+                Navigator.of(dialogContext).pop();
+                _deleteEvent(context);
               },
             ),
           ],
@@ -374,7 +372,7 @@ class InterestedToggleButton extends StatefulWidget {
     Key? key,
     required this.eventId,
     required this.launchGoogleCalendar,
-    required this.eventData, // Add this line
+    required this.eventData,
   }) : super(key: key);
 
   @override
@@ -421,13 +419,10 @@ class _InterestedToggleButtonState extends State<InterestedToggleButton> {
         .collection('peopleInterested');
 
     if (isInterested) {
-      // Add the user's UID to the collection
       await interestedRef.doc(currentUserId).set({'uid': currentUserId});
 
-      // Integrate with the calendar
       launchGoogleCalendar();
     } else {
-      // Remove the user's UID from the collection
       await interestedRef.doc(currentUserId).delete();
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -449,7 +444,6 @@ class _InterestedToggleButtonState extends State<InterestedToggleButton> {
   }
 
   void launchGoogleCalendar() async {
-    // Replace the placeholders with your actual event details
     String eventName = widget.eventData['eventName'] ?? 'Your Event Name';
     String eventDescription =
         widget.eventData['description'] ?? 'Your Event Description';
@@ -469,14 +463,11 @@ class _InterestedToggleButtonState extends State<InterestedToggleButton> {
     DateTime eventDateTime =
         DateFormat('d/M/yyyy h:mm a').parse('$eventDate $eventTime');
 
-    // Format the date and time
     String formattedDate = DateFormat('yyyyMMddTHHmmss').format(eventDateTime);
 
-    // Construct the Google Calendar event URL
     String googleCalendarUrl =
         'https://www.google.com/calendar/render?action=TEMPLATE&text=$eventName&details=$eventDescription&location=$eventLocation&dates=$formattedDate/$formattedDate';
 
-    // Launch the URL using launchUrl from url_launcher package
     try {
       await launchUrl(Uri.parse(googleCalendarUrl));
     } catch (e) {
@@ -520,7 +511,6 @@ class _AnnouncementsSectionState extends State<AnnouncementsSection> {
     String announcementText = _announcementController.text.trim();
 
     if (announcementText.isEmpty) {
-      // Optionally show a message to the user that the announcement text cannot be empty
       return;
     }
 
@@ -531,10 +521,9 @@ class _AnnouncementsSectionState extends State<AnnouncementsSection> {
           .collection('announcements')
           .add({
         'text': announcementText,
-        'timestamp': FieldValue.serverTimestamp(), // Stores the current time
+        'timestamp': FieldValue.serverTimestamp(),
       });
 
-      // Clear the text field after successfully posting the announcement
       _announcementController.clear();
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -555,7 +544,6 @@ class _AnnouncementsSectionState extends State<AnnouncementsSection> {
       print('Announcement successfully posted.');
     } catch (error) {
       print('Error posting announcement: $error');
-      // Optionally handle errors, such as showing an error message to the user
     }
   }
 

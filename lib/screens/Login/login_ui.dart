@@ -25,7 +25,7 @@ class _LoginUiState extends State<LoginUi> {
                     'Login/Register',
                     style: TextStyle(fontSize: 30),
                   ),
-                  SizedBox(height: 40), // Space between text and button
+                  SizedBox(height: 40),
                   GoogleSignInButtonWidget(
                     onPressed: () => firebaseGoogleSigninProvider(context),
                   ),

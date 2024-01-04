@@ -1,5 +1,3 @@
-// ignore_for_file: prefer_const_constructors
-
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -29,12 +27,12 @@ class _CustomDrawerState extends State<CustomDrawer> {
           ListTile(
             title: Row(
               mainAxisAlignment:
-                  MainAxisAlignment.spaceBetween, // Aligns the elements in Row
+                  MainAxisAlignment.spaceBetween,
               children: [
                 Text('Theme',
                     style: TextStyle(
                         fontSize:
-                            16)), // Adds a text label for the theme switcher
+                            16)),
                 Row(
                   children: [
                     IconButton(
@@ -42,7 +40,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
                         Provider.of<ThemeNotifier>(context, listen: false)
                             .setThemeMode(ThemeMode.light);
                       },
-                      icon: Icon(Icons.wb_sunny), // Light mode icon
+                      icon: Icon(Icons.wb_sunny),
                       tooltip: 'Light theme',
                     ),
                     IconButton(
@@ -50,7 +48,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
                         Provider.of<ThemeNotifier>(context, listen: false)
                             .setThemeMode(ThemeMode.dark);
                       },
-                      icon: Icon(Icons.nightlight_round), // Dark mode icon
+                      icon: Icon(Icons.nightlight_round),
                       tooltip: 'Dark theme',
                     ),
                   ],

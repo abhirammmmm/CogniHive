@@ -1,5 +1,3 @@
-// ignore_for_file: prefer_const_constructors, prefer_final_fields, library_private_types_in_public_api, avoid_print, prefer_const_constructors_in_immutables
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cognihive_version1/models/user_data.dart';
 import 'package:cognihive_version1/screens/home/home_page.dart';
@@ -75,7 +73,6 @@ class _NewUserDetailsState extends State<NewUserDetails> {
     );
   }
 
-  // Other buildForm, buildDatePickerForm, and buildGenderDropdown methods remain the same
 
   Widget buildCollegeDropdown() {
     return Column(
@@ -170,7 +167,7 @@ class _NewUserDetailsState extends State<NewUserDetails> {
                   "${pickedDate.day}-${pickedDate.month}-${pickedDate.year}";
               setState(() {
                 controller.text =
-                    formattedDate; // Update the text of the controller
+                    formattedDate;
               });
             }
           },
@@ -227,7 +224,6 @@ class _NewUserDetailsState extends State<NewUserDetails> {
 
   void _finishProfile() {
     if (_formKey.currentState!.validate()) {
-      // Print values
       print('First Name: ${_firstNameController.text}');
       print('Last Name: ${_lastNameController.text}');
       print('Phone Number: ${_phoneController.text}');
@@ -253,7 +249,6 @@ class _NewUserDetailsState extends State<NewUserDetails> {
       }).then((value) {
         print('User profile updated.');
         Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => HomePage()));
-        // Optionally navigate the user away from the profile page
       }).catchError((error) {
         print('Error updating user profile: $error');
       });

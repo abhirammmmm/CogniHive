@@ -1,5 +1,3 @@
-// ignore_for_file: prefer_const_literals_to_create_immutables, prefer_const_constructors
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cognihive_version1/firebase_options.dart';
 import 'package:cognihive_version1/screens/Login/login_ui.dart';
@@ -62,8 +60,6 @@ class RunMyApp extends StatelessWidget {
 }
 
 
-
-//This class represents the landing page of the application, If the User instance is present then - HomePage, else LoginUI
 class LandingPage extends StatelessWidget {
   const LandingPage({Key? key}) : super(key: key);
 

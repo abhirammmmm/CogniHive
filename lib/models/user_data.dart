@@ -15,7 +15,6 @@ class UserData {
     this.college = 'BTH',
   });
 
-  // Add a method to populate data from a map (useful when fetching data from Firestore)
   UserData.fromMap(Map<String, dynamic> map)
       : firstName = map['firstName'] ?? '',
         lastName = map['lastName'] ?? '',

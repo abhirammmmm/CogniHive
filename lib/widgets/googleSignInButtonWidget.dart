@@ -19,8 +19,8 @@ class GoogleSignInButtonWidget extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Image.asset(
-            'assets/google_icon.png', // Replace with the path to your Google logo asset
-            height: 18.0, // Adjust the height as needed
+            'assets/google_icon.png',
+            height: 18.0,
           ),
           const SizedBox(width: 12.0),
           const Text(

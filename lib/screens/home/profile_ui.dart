@@ -1,5 +1,3 @@
-// ignore_for_file: prefer_const_constructors, prefer_final_fields, library_private_types_in_public_api, avoid_print, prefer_const_constructors_in_immutables
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cognihive_version1/models/user_data.dart';
 import 'package:cognihive_version1/screens/home/home_page.dart';
@@ -61,7 +59,6 @@ class _ProfileUIState extends State<ProfileUI> {
     _lastNameController.addListener(_onFieldChanged);
     _phoneController.addListener(_onFieldChanged);
     _dobController.addListener(_onFieldChanged);
-    // No need to add listeners to dropdowns as onChanged will handle it
   }
 
   void _onFieldChanged() {
@@ -90,7 +87,7 @@ class _ProfileUIState extends State<ProfileUI> {
           _selectedGender = userData['gender'] ?? 'Male';
           _selectedCollege = userData['college'] ?? 'BTH';
           setState(() {
-            _isLoadingData = false; // Data loading complete
+            _isLoadingData = false;
           });
         }
       } catch (e) {
@@ -103,16 +100,16 @@ class _ProfileUIState extends State<ProfileUI> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: PreferredSize(
-        preferredSize: Size.fromHeight(27.0), // Adjust the height as needed
+        preferredSize: Size.fromHeight(27.0),
         child: AppBar(
-          title: const Text(''), // Empty text to remove the app bar text
+          title: const Text(''),
           backgroundColor: Colors.transparent,
           elevation: 0,
           iconTheme: IconThemeData(
             color: Theme.of(context).brightness == Brightness.dark
                 ? Colors.white
                 : const Color(0xFF1E2832),
-          ), // Menu icon color
+          ),
         ),
       ),
       body: Padding(
@@ -137,7 +134,7 @@ class _ProfileUIState extends State<ProfileUI> {
               ElevatedButton(
                 onPressed: _isChanged
                     ? _saveProfile
-                    : null, // Enable button if changes are detected
+                    : null,
                 style: ElevatedButton.styleFrom(
                   padding: EdgeInsets.symmetric(horizontal: 50),
                   backgroundColor: Color(0xFFE46831),
@@ -151,8 +148,6 @@ class _ProfileUIState extends State<ProfileUI> {
       ),
     );
   }
-
-  // Other buildForm, buildDatePickerForm, and buildGenderDropdown methods remain the same
 
   Widget buildCollegeDropdown() {
     return Column(
@@ -247,7 +242,7 @@ class _ProfileUIState extends State<ProfileUI> {
                   "${pickedDate.day}-${pickedDate.month}-${pickedDate.year}";
               setState(() {
                 controller.text =
-                    formattedDate; // Update the text of the controller
+                    formattedDate;
               });
             }
           },
@@ -350,7 +345,7 @@ class _ProfileUIState extends State<ProfileUI> {
           );
           Navigator.pushReplacement(
               context, MaterialPageRoute(builder: (context) => HomePage()));
-          // Optionally navigate the user away from the profile page
+
         }).catchError((error) {
           print('Error updating user profile: $error');
         });

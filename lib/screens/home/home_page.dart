@@ -84,7 +84,6 @@ class _HomePageState extends State<HomePage> {
       ),
       endDrawer: CustomDrawer(
         onThemeChanged: (themeMode) {
-          // Handle theme change if needed
         },
       ),
       body: Column(

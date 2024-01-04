@@ -1,5 +1,3 @@
-// ignore_for_file: prefer_const_constructors, prefer_final_fields, library_private_types_in_public_api, avoid_print, prefer_const_constructors_in_immutables, use_key_in_widget_constructors, deprecated_member_use
-
 import 'dart:math';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -301,7 +299,6 @@ class _EventFormState extends State<EventForm> {
   }
 
   Future <void> launchGoogleCalendar() async {
-    // Replace the placeholders with your actual event details
     String eventName = eventNameController.text ?? 'Your Event Name';
     String eventDescription = descriptionController.text ?? 'Your Event Description';
     String eventDate = _formatDate(selectedDate!) ?? '';
@@ -319,14 +316,11 @@ class _EventFormState extends State<EventForm> {
 
     DateTime eventDateTime = DateFormat('d/M/yyyy h:mm a').parse('$eventDate $eventTime');
 
-    // Format the date and time
     String formattedDate = DateFormat('yyyyMMddTHHmmss').format(eventDateTime);
 
-    // Construct the Google Calendar event URL
     String googleCalendarUrl =
         'https://www.google.com/calendar/render?action=TEMPLATE&text=$eventName&details=$eventDescription&location=$eventLocation&dates=$formattedDate/$formattedDate';
 
-    // Launch the URL using launchUrl from url_launcher package
     try {
       await launch(googleCalendarUrl);
     } catch (e) {
