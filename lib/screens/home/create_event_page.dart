@@ -5,6 +5,7 @@ import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'drawer_item.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -38,6 +39,8 @@ class CreateEventPage extends StatelessWidget {
 }
 
 class EventForm extends StatefulWidget {
+  get eventData => null;
+
   @override
   _EventFormState createState() => _EventFormState();
 }
@@ -148,7 +151,7 @@ class _EventFormState extends State<EventForm> {
       'eventNameLower': eventNameController.text.toLowerCase(),
     }).then((_) async {
       print("Event successfully created");
-      await _launchGoogleCalendar();
+      await launchGoogleCalendar();
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -202,10 +205,11 @@ class _EventFormState extends State<EventForm> {
             primary: Colors.orange[800],
           ),
           child: Text(
-              style: TextStyle(color: Colors.white),
-              selectedDate == null
-                  ? 'Select Date'
-                  : 'Selected Date: ${_formatDate(selectedDate!)}'),
+            selectedDate == null
+                ? 'Select Date'
+                : 'Selected Date: ${_formatDate(selectedDate!)}',
+            style: TextStyle(color: Colors.white),
+          ),
         ),
         if (selectedDate == null)
           Padding(
@@ -248,10 +252,11 @@ class _EventFormState extends State<EventForm> {
             primary: Colors.orange[800],
           ),
           child: Text(
-              style: TextStyle(color: Colors.white),
-              selectedTime == null
-                  ? 'Select Time'
-                  : 'Selected Time: ${_formatTime(selectedTime!)}'),
+            selectedTime == null
+                ? 'Select Time'
+                : 'Selected Time: ${_formatTime(selectedTime!)}',
+            style: TextStyle(color: Colors.white),
+          ),
         ),
         if (selectedTime == null)
           Padding(
@@ -295,22 +300,39 @@ class _EventFormState extends State<EventForm> {
     return '$hour$minute';
   }
 
-  Future<void> _launchGoogleCalendar() async {
-    if (selectedDate == null || selectedTime == null) {
+  Future <void> launchGoogleCalendar() async {
+    // Replace the placeholders with your actual event details
+    String eventName = eventNameController.text ?? 'Your Event Name';
+    String eventDescription = descriptionController.text ?? 'Your Event Description';
+    String eventDate = _formatDate(selectedDate!) ?? '';
+    String eventTime = _formatTime(selectedTime!) ?? '';
+    String eventLocation = locationController.text ?? ''; // Add this line
+
+    print('Event Date: $eventDate');
+    print('Event Time: $eventTime');
+    print('Event Location: $eventLocation');
+
+    if (eventDate.isEmpty || eventTime.isEmpty) {
+      print('Invalid date or time format.');
       return;
     }
 
-    try {
-      String googleCalendarUrl =
-          'https://www.google.com/calendar/render?action=TEMPLATE'
-          '&text=${Uri.encodeComponent(eventNameController.text)}'
-          '&details=${Uri.encodeComponent(descriptionController.text)}'
-          '&location=${Uri.encodeComponent(locationController.text)}'
-          '&dates=${_formatGoogleCalendarDate(selectedDate!)}T${_formatGoogleCalendarTime(selectedTime!)}';
+    DateTime eventDateTime = DateFormat('d/M/yyyy h:mm a').parse('$eventDate $eventTime');
 
+    // Format the date and time
+    String formattedDate = DateFormat('yyyyMMddTHHmmss').format(eventDateTime);
+
+    // Construct the Google Calendar event URL
+    String googleCalendarUrl =
+        'https://www.google.com/calendar/render?action=TEMPLATE&text=$eventName&details=$eventDescription&location=$eventLocation&dates=$formattedDate/$formattedDate';
+
+    // Launch the URL using launchUrl from url_launcher package
+    try {
       await launch(googleCalendarUrl);
     } catch (e) {
-      print('Error launching Google Calendar: $e');
+      print('Could not launch Google Calendar: $e');
     }
   }
 }
+
+void launchUrl(Uri parse) {}
