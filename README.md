@@ -110,7 +110,7 @@ The app will launch on your connected Android or iOS device or on the emulator.
 ## Development
 
 ### Project Structure
-
+'''
 |-- test
 |   |-- eventcard_test.dart           # Unit test for the EventCard widget to ensure proper functionality.
 |   |-- login_ui_test.dart            # UI test for the login screen, checking the login flow and UI components.
@@ -272,7 +272,7 @@ The app will launch on your connected Android or iOS device or on the emulator.
 |   |-- index
 |   |-- hooks
 |   |-- ...
-  
+'''
 ### Known Issues
 
 - Limited offline functionality.
